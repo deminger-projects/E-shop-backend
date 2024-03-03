@@ -18,11 +18,14 @@ function handle_edit(records, record_id, file_names_to_keep, folder, files) {
     return __awaiter(this, void 0, void 0, function* () {
         var update_records_responce = yield (0, update_records_1.default)(records, record_id, file_names_to_keep);
         if (update_records_responce.status === false) {
-            return { status: false, msg: "records did not updated/duplicit value" };
+            return { status: false, msg: "records did not updated/duplicit value", duplicit_value: update_records_responce.duplicit_value };
         }
         else if (update_records_responce.status === true && file_names_to_keep && folder && files) {
             yield (0, update_files_1.default)(file_names_to_keep, folder, record_id, files);
             return { status: true, msg: "records updated", duplicit_value: update_records_responce.duplicit_value };
+        }
+        else if (update_records_responce.status === true) {
+            return { status: true, msg: "records update", duplicit_value: update_records_responce.duplicit_value };
         }
         else {
             return { status: false, msg: "records update failed", duplicit_value: update_records_responce.duplicit_value };

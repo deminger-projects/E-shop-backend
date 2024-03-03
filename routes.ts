@@ -1,222 +1,183 @@
 import { Router, Request, Response } from "express";
-import { FileArray } from "express-fileupload";
 
-import handle_add from "./controller/handlers/handler_add.js";
-import update_json_files from "./controller/file_handlers/updates/update_json_files.js";
-import handle_edit from "./controller/handlers/hadle_edit.js";
-import handle_status_change from "./controller/handlers/handle_status_change.js";
-import handle_login from "./controller/handlers/handle_login.js";
-import handle_register from "./controller/handlers/handle_register.js";
-import update_login_data from "./controller/file_handlers/updates/update_login_data.js";
 import add_item from "./controller/handle_cart/add_item.js";
 import delete_item from "./controller/handle_cart/delete_item.js";
-import handle_refund from "./controller/handlers/handle_refund.js";
+
+import error_handler from "./controller/middleware/error_handler.js";
+import try_catch from "./controller/utils/try_catch.js";
+import request_data_transformer from "./controller/middleware/request_data_transformer.js";
+import check_for_duplicit_record from "./controller/middleware/check_for_duplicit_record.js";
+
+import insert_records from "./controller/sql/insert_records.js"
+import update_records from "./controller/sql/update_records.js";
+
+import login_request_validation from "./controller/middleware/login_request_validation.js";
+import register_request_validation from "./controller/middleware/register_request_validation.js";
+
+import update_files from "./controller/file_handlers/updates/update_files.js";
+import save_files from "./controller/file_handlers/savers/save_files.js";
+
+import send_emails from "./controller/other/send_emails.js";
+
+import select_request from "./DB/select_request.js";
+
+import update_login_data from "./controller/file_handlers/updates/update_login_data.js";
+import update_not_user_data from "./controller/file_handlers/updates/update_not_user_data.js";
+import update_admin_data from "./controller/file_handlers/updates/update_admin_data.js";
+import udpade_user_data from "./controller/file_handlers/updates/update_user_data.js";
 import empty_cart from "./controller/handle_cart/empty_cart.js";
-import handle_send_aut_code from "./controller/handlers/handle_send_aut_code.js";
-import stripe_payment from "./controller/apis/stripe.js";
-import { write } from "fs";
-import write_json from "./controller/file_handlers/write_json.js";
+import refund_request_validation from "./controller/middleware/refund_request_validation.js";
 
 export const router = Router()  
 
-router.post('/stripe_payment_webhook', async function (req: Request, res: Response) {   
-console.log("🚀 ~ file: routes.ts:23 ~ req:", req.body.data.object.metadata)
+  router.post('/login_request', request_data_transformer, login_request_validation, try_catch(async function (req: Request, res: Response) {   
 
-//var handle_add_responce = await handle_add(JSON.parse(req.body.data.object.metadata.tables))
+    await update_records(["users"], [["login_status"]], [[["Active"]]], req.body.login_request_validation.user_id)
 
-var kokotina = "whsec_b6e67eada329714ee59ea0f0cea0617712dc177e12091c01d5f83e5196c52d49"
-  console.log("penis2")
- 
-  res.sendStatus(200);
-})
- 
+    if(req.body.login_request_validation.user_id == process.env.ADMIN_ID){
+      console.log("admin")
+      await update_admin_data(req.body.login_request_validation.user_id)
+    }else{
+      await udpade_user_data(req.body.login_request_validation.user_id)
+    }
 
-  router.post('/get_stripe_payment_url', async function (req: Request, res: Response) {   
-    await stripe_payment(JSON.parse(req.body.items), JSON.parse(req.body.tables), (session: any, err: any) => {
-      console.log("🚀 ~ file: routes.ts:33 ~ awaitstripe_payment ~ err:", err)
-      console.log("🚀 ~ file: routes.ts:33 ~ awaitstripe_payment ~ session:", session)
-      if(err){
-        res.send({error: err.msg})
-      }else{
-        res.send({payment_url: session.url})
-      }
-    }) 
-  })
+    res.send({msg: "user loged in", next_status: true, status: true})
+
+  }))
  
-  router.post('/add_record', async function (req: Request, res: Response) {   
+  router.post('/logoff_request', request_data_transformer, try_catch(async function (req: Request, res: Response) {   
+
+    await update_records(["users"], [["login_status"]], [[["Inactive"]]], req.body.record_id)
+
+    await update_login_data(req.body.user_id)
+
+    res.send({msg: "user loged off", next_status: true, status: true})
+
+  }))
+
+
+  router.post('/register_request', request_data_transformer, register_request_validation, try_catch(async function (req: Request, res: Response) {   
+
+    const transformed_data = req.body.transformed_data
+
+    const record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
+
+    await udpade_user_data(Number(record_id))
+
+    res.send({msg: "user registred", next_status: true, status: true})
+
+  }))
+
+
+
+
+
+
+  router.post('/add_record', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) {   
+
+    const transformed_data = req.body.transformed_data
+
+    var record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
     if(req.files){
-      var handle_add_responce = await handle_add(JSON.parse(req.body.tables), req.files as FileArray, req.body.folder)
+      await save_files("../client/public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files)
+    }
 
-      if(handle_add_responce.status === true){
-        if(req.body.order){
-          empty_cart()
-        }
-
-        if(!req.body.user_id){
-          await update_json_files()
-          console.log("test")
-        }else{
-          await update_json_files(req.body.user_id)
-          console.log("test")
-
-        }
-
-        res.send({msg: "records saved", status: true, duplicit_value: handle_add_responce.duplicit_value})
-
+    if(req.body.user_id){
+      if(req.body.user_id == process.env.ADMIN_ID){
+        await update_admin_data(req.body.user_id)
       }else{
-        res.send({msg: "error ocured", status: false, duplicit_value: handle_add_responce.duplicit_value})
+        await udpade_user_data(req.body.user_id)
       }
     }else{
-      var handle_add_responce = await handle_add(JSON.parse(req.body.tables))
-
-      if(handle_add_responce.status === true){
-        if(req.body.order){
-          empty_cart()
-        }
-
-        if(!req.body.user_id){
-          await update_json_files()
-          console.log("test")
-
-        }else{
-          await update_json_files(req.body.user_id)
-          console.log("test")
-
-        }
-
-        res.send({msg: "records saved", status: true, duplicit_value: handle_add_responce.duplicit_value})
-
-      }else{
-        res.send({msg: "error ocured", status: false, duplicit_value: handle_add_responce.duplicit_value})
-      }
+      await update_not_user_data()
     }
-  })        
 
-  router.post('/edit_record', async function (req: Request, res: Response) {   
-    
-    if(!req.body.folder){
-      var hadle_edit_responce = await handle_edit(JSON.parse(req.body.tables), req.body.record_id)
+    if(req.body.order){
+      empty_cart()
+    }
 
-      if(hadle_edit_responce.status === true){
-          if(!req.body.user_id){
-            await update_json_files()
-          }else{
-            await update_json_files(req.body.user_id)
-          }
-          res.send({msg: "records updated", status: true, duplicit_value: hadle_edit_responce.duplicit_value})
-      }else{
-        res.send({msg: "error ocured", status: false, duplicit_value: hadle_edit_responce.duplicit_value})
-      }
-    }else if(!req.files){
-      var hadle_edit_responce = await handle_edit(JSON.parse(req.body.tables), req.body.record_id, JSON.parse(req.body.files_names_to_keep), req.body.folder)
+    res.send({msg: "record added", next_status: true, status: true})
 
-      if(hadle_edit_responce.status === true){
-        if(!req.body.user_id){
-          await update_json_files()
-        }else{
-          await update_json_files(req.body.user_id)
-        }
-        res.send({msg: "records updated", status: true, duplicit_value: hadle_edit_responce.duplicit_value})
+  }))  
 
+  router.post('/edit_record', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) { 
+
+    const transformed_data = req.body.transformed_data
+
+    if(req.body.files_names_to_keep){
+      await update_records(transformed_data.tables, transformed_data.columns, transformed_data.values, JSON.parse(req.body.record_id), JSON.parse(req.body.files_names_to_keep))
     }else{
-      res.send({msg: "error ocured", status: false, duplicit_value: hadle_edit_responce.duplicit_value})
+      await update_records(transformed_data.tables, transformed_data.columns, transformed_data.values, JSON.parse(req.body.record_id))
     }
-    }else{
-      var hadle_edit_responce = await handle_edit(JSON.parse(req.body.tables), req.body.record_id, JSON.parse(req.body.files_names_to_keep), req.body.folder, req.files as FileArray)
+  
+    if(req.files){
+      await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id), req.files)
+    }else if(req.body.files_names_to_keep){
+      await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id))
+    }
 
-      if(hadle_edit_responce.status === true){
-        if(!req.body.user_id){
-          await update_json_files()
-        }else{
-          await update_json_files(req.body.user_id)
-        }
-        res.send({msg: "records updated", status: true, duplicit_value: hadle_edit_responce.duplicit_value})
-
+    if(req.body.user_id){
+      if(req.body.user_id == process.env.ADMIN_ID){
+        await update_admin_data(req.body.user_id)
       }else{
-        res.send({msg: "error ocured", status: false, duplicit_value: hadle_edit_responce.duplicit_value})
-    }
-    }
-  })
-
-  router.post('/change_status', async function (req: Request, res: Response) {   
-
-    var change_result = await handle_status_change(JSON.parse(req.body.tables), req.body.record_id)
-
-    if(change_result.status){
-      if(!req.body.user_id){
-        await update_json_files()
-      }else{
-        await update_json_files(req.body.user_id)
+        await udpade_user_data(req.body.user_id)
       }
+    }else{
+      await update_not_user_data()
     }
 
-    res.send({status: change_result.status, msg: change_result.msg});
-
-  })
-
-
-
-
-
-
-
-
-
-
-
-  router.post('/login_reguest', async function (req: Request, res: Response) {   
-
-    var login_result = await handle_login(JSON.parse(req.body.tables), req.body.record_id)
-
-    if(login_result.status && login_result.user_id){
-      await update_login_data(login_result.user_id)
+    if(req.body.psw_change){
+      res.send({msg: "password changed", next_status: true})
     }
 
-    res.send({msg: login_result.msg, status: login_result.status, user_id: login_result.user_id})
-  })
+    res.send({msg: "record edited", next_status: true})
+  }))  
 
-  router.post('/register_request', async function (req: Request, res: Response) {   
 
-    var register_result = await handle_register(JSON.parse(req.body.tables))
+  router.post('/change_record_status', request_data_transformer, try_catch(async function (req: Request, res: Response) { 
 
-    if(register_result.user_id){
-      update_json_files(Number(register_result.user_id))
+    const transformed_data = req.body.transformed_data
+
+    await update_records(transformed_data.tables, transformed_data.columns, transformed_data.values, req.body.record_id)
+ 
+    if(req.body.user_id){
+      if(req.body.user_id == process.env.ADMIN_ID){
+        await update_admin_data(req.body.user_id)
+      }else{
+        await udpade_user_data(req.body.user_id)
+      }
+    }else{
+      await update_not_user_data()
     }
 
-    res.send({msg: register_result.msg, status: register_result.status, user_id: register_result.user_id})
+    res.send({msg: "status changed", next_status: true, status: true})
 
-  })
-
-
-
-
-
-
-
-
-
-
+  }))  
 
 
  
 
 
-  router.post('/add_to_cart', function (req: Request, res: Response) {   
+
+
+
+
+  router.post('/add_to_cart', try_catch(async function (req: Request, res: Response) {   
 
     add_item(JSON.parse(req.body.product), JSON.parse(req.body.selected_size))
     
     res.send({msg: "added to cart"})
 
-  })
+  }))
 
-  router.post('/delete_from_cart', function (req: Request, res: Response) {   
+  router.post('/delete_from_cart', try_catch(async function (req: Request, res: Response) {   
 
     delete_item(req.body.pozition)
     
     res.send({msg: "deleted from cart"})
 
-  })
+  }))
 
 
 
@@ -224,34 +185,43 @@ var kokotina = "whsec_b6e67eada329714ee59ea0f0cea0617712dc177e12091c01d5f83e5196
 
 
 
+  router.post('/refund_request', request_data_transformer, check_for_duplicit_record, refund_request_validation, try_catch(async function (req: Request, res: Response) {   
+    
+    var code = Math.floor(100000 + Math.random() * 900000).toString()
 
+    send_emails([req.body.transformed_data.email], code)
 
+    var refund_products = await select_request("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id WHERE order_id = ?;", req.body.order_data[0].id)
 
-
-
-
-
-  router.post('/refund_request', async function (req: Request, res: Response) {   
-
-    var refund_result = await handle_refund(JSON.parse(req.body.tables), req.body.email)
-
-    if(refund_result.code){
-      res.send({msg: refund_result.msg, status: refund_result.status, code: refund_result.code, data: refund_result.data})
+    if(req.body.user_id){
+      if(req.body.user_id == process.env.ADMIN_ID){
+        await update_admin_data(req.body.user_id)
+      }else{
+        await udpade_user_data(req.body.user_id)
+      }
     }else{
-      res.send({msg: refund_result.msg, status: refund_result.status})
+      await update_not_user_data()
     }
-  })
+    
+    res.send({msg: "order found", next_status: true, status: true, code: code, data: {refunds: [req.body.order_data[0]], order_products: refund_products}})
+
+  }))
 
 
 
-  router.post('/send_aut_code', async function (req: Request, res: Response) {   
 
-    var send_aut_code_result = await handle_send_aut_code(JSON.parse(req.body.tables))
 
-    if(send_aut_code_result.code){
-      res.send({code: send_aut_code_result.code, status: send_aut_code_result.status, msg: send_aut_code_result.msg, record_id: send_aut_code_result.record_id})
-    }else{
-      res.send({status: send_aut_code_result.status, msg: send_aut_code_result.msg})
-    }
 
-  })
+
+
+  router.post('/send_aut_code', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) {   
+
+    var code = Math.floor(100000 + Math.random() * 900000).toString()
+
+    send_emails([req.body.transformed_data.email], code)
+
+    res.send({msg: "order found", next_status: true, status: true, code: code, record_id: req.body.user_id_auth})
+
+  }))
+
+  router.use(error_handler)

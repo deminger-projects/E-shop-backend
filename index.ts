@@ -2,9 +2,11 @@ import express, {Express} from "express";
 import cors from 'cors';
 import fileUpload from 'express-fileupload'
 import bp from 'body-parser';
+require("dotenv").config()
 
 import {router} from './routes.js';
 import load_json_files from "./controller/file_handlers/loaders/load_json_files.js";
+import update_not_user_data from "./controller/file_handlers/updates/update_not_user_data.js";
 
 const app: Express = express();
 
@@ -16,11 +18,9 @@ app.use(fileUpload())   //file support
 
 app.use('/', router)  // pristupuje k app.post/get requestum
 
-load_json_files().then(
+update_not_user_data().then(
   result => {
-    app.listen(8001, () => {          // zapne server na portu 8001
-      console.log("Server running successfully on 8001");
-    })
-  }
-) // loads needed data
-
+  app.listen(8001, () => {          // zapne server na portu 8001
+    console.log("Server running successfully on 8001");
+  })
+})

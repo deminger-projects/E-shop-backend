@@ -16,7 +16,6 @@ export default async function check_duplicity(data: TransformedData, record_id?:
       var sql = "SELECT * FROM " + data.tables[0] + " WHERE (login_status = 'Inactive' OR login_status = 'Active')"
     }else{
       var sql = "SELECT * FROM " + data.tables[0] + " WHERE status = 'Active'"
-
     }
   }else{
     var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + record_id

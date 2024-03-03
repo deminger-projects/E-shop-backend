@@ -31,7 +31,7 @@ function save_records(records) {
                 }
             }
             else {
-                (0, inserts_1.default)(new_data.tables[table_index], new_data.columns[table_index], new_data.values[table_index], last_inserted_id);
+                yield (0, inserts_1.default)(new_data.tables[table_index], new_data.columns[table_index], new_data.values[table_index], last_inserted_id);
             }
         }
         return { status: true, msg: "no duplicit value", last_inserted_id: last_inserted_id, duplicit_value: false };

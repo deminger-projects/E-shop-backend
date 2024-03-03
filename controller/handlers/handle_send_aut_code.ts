@@ -6,7 +6,7 @@ export default async function handle_send_aut_code(records: object){
 
     var new_data = transform_records(records)
 
-    var dup_check_result = await check_duplicity(new_data)
+    var dup_check_result = await check_duplicity(new_data, undefined, 'register')
 
     if(dup_check_result.status){
         var code = Math.floor(100000 + Math.random() * 900000).toString()

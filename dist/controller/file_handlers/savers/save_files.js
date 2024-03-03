@@ -35,6 +35,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 function save_files(path, files) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("🚀 ~ save_files ~ files:", files);
+        console.log("🚀 ~ save_files ~ path:", path);
         fs.mkdir(path, (err) => {
             if (err) {
                 console.log("🚀 ~ file: save_files.ts:8 ~ fs.mkdir ~ err:", err.message);

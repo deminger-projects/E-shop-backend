@@ -24,6 +24,9 @@ function handle_add(records, files, folder) {
             yield (0, save_files_js_1.default)("../client/public/images/" + folder + "/" + save_records_responce.last_inserted_id, files);
             return { status: true, msg: "records saved", duplicit_value: save_records_responce.duplicit_value };
         }
+        else if (save_records_responce.status === true) {
+            return { status: true, msg: "records save" };
+        }
         else {
             return { status: false, msg: "records save error" };
         }

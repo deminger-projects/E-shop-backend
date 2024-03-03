@@ -12,11 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const write_json_1 = __importDefault(require("../write_json"));
+const get_login_data_1 = __importDefault(require("../gettets/get_login_data"));
 function update_login_data(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        //login_data
-        yield (0, write_json_1.default)(["SELECT users.id, users.username, users.password, users.login_status from users WHERE users.id = " + id + " ;"], "../client/src/data/login_data.json");
+        yield (0, get_login_data_1.default)(id);
     });
 }
 exports.default = update_login_data;

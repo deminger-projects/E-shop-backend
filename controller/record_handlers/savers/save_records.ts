@@ -20,7 +20,7 @@ export default async function save_records(records: object){
                 return ({status: false, msg: dup_check_result.msg, duplicit_value: true})
             }
         }else{
-            sql_inserts(new_data.tables[table_index], new_data.columns[table_index], new_data.values[table_index], last_inserted_id)
+            await sql_inserts(new_data.tables[table_index], new_data.columns[table_index], new_data.values[table_index], last_inserted_id)
         }
     }
     return {status: true, msg: "no duplicit value", last_inserted_id: last_inserted_id, duplicit_value: false}

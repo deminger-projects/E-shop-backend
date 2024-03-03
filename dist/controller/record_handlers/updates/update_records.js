@@ -23,7 +23,7 @@ function update_records(records, record_id, file_names_to_keep) {
         for (let index = 0; index < new_data.tables.length; index++) {
             if (index === 0) {
                 if (!((yield (0, check_duplicity_1.default)(new_data, record_id)).status)) {
-                    (0, update_1.default)(new_data.tables[0], new_data.columns[0], new_data.values[0][0], record_id);
+                    yield (0, update_1.default)(new_data.tables[0], new_data.columns[0], new_data.values[0][0], record_id);
                 }
                 else {
                     return { status: false, msg: "duplicit value", duplicit_value: true };
@@ -38,7 +38,7 @@ function update_records(records, record_id, file_names_to_keep) {
                     }
                 }
                 yield (0, delete_1.default)(new_data.tables[index], (new_data.tables[index].split("_"))[0] + "_id", record_id);
-                (0, inserts_1.default)(new_data.tables[index], new_data.columns[index], new_data.values[index]);
+                yield (0, inserts_1.default)(new_data.tables[index], new_data.columns[index], new_data.values[index]);
             }
         }
         return { status: true, msg: "records updated", duplicit_value: false };

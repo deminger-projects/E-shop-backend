@@ -18,7 +18,7 @@ const transform_records_1 = __importDefault(require("../other/transform_records"
 function handle_send_aut_code(records) {
     return __awaiter(this, void 0, void 0, function* () {
         var new_data = (0, transform_records_1.default)(records);
-        var dup_check_result = yield (0, check_duplicity_1.default)(new_data);
+        var dup_check_result = yield (0, check_duplicity_1.default)(new_data, undefined, 'register');
         if (dup_check_result.status) {
             var code = Math.floor(100000 + Math.random() * 900000).toString();
             (0, send_emails_1.default)([new_data.values[0][0][0]], code);

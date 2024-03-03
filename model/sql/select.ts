@@ -1,6 +1,7 @@
 import {pool} from "../../DB/pool"
 
 export default async function sql_select(sql: string){
+ 
   return new Promise<Array<{[key: string]: string|number|null|Array<string>|Array<number>}>>((resolve, reject) => {
       pool.getConnection((conn_err, conn) => {
         if(conn_err){

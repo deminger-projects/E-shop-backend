@@ -31,7 +31,7 @@ export default function sql_update(table: string, columns: Array<string>, values
             if(err){
               console.log("🚀 ~ file: sql_select.ts:21 ~ pool.query ~ err:", err.message)
             }else{ 
-              resolve({affected_rows: result.affectedRows, msg: "records deleted"})
+              resolve({affected_rows: result, msg: "records deleted"})
             }
           })
         }

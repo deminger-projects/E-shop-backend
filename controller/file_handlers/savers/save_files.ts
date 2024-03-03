@@ -2,6 +2,8 @@ import * as fs from "fs"
 import { FileArray, UploadedFile } from 'express-fileupload'
 
 export default async function save_files(path: string, files: FileArray){
+console.log("🚀 ~ save_files ~ files:", files)
+console.log("🚀 ~ save_files ~ path:", path)
 
     fs.mkdir(path, (err) => {   // creates folder
       if(err){
