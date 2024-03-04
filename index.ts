@@ -5,7 +5,6 @@ import bp from 'body-parser';
 require("dotenv").config()
 
 import {router} from './routes.js';
-import load_json_files from "./controller/file_handlers/loaders/load_json_files.js";
 import update_not_user_data from "./controller/file_handlers/updates/update_not_user_data.js";
 
 const app: Express = express();
