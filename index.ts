@@ -19,9 +19,11 @@ app.use('/', router)  // pristupuje k app.post/get requestum
 
 console.log("node js jedo more")
 
+//process.env.PORT
+
 update_not_user_data().then(
   result => {
-  app.listen(process.env.PORT, () => {          // zapne server na portu 8001
+  app.listen(3306, () => {          // zapne server na portu 8001
     console.log("Server running successfully on 8001");
   })
 })

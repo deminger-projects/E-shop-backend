@@ -36,16 +36,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
-const select_js_1 = __importDefault(require("../../model/sql/select.js"));
+const select_request_js_1 = __importDefault(require("../../DB/select_request.js"));
 function write_json(sql_tasks, file) {
     return __awaiter(this, void 0, void 0, function* () {
         var table_names = [];
         var prom_arr = [];
-        var results = yield (0, select_js_1.default)(sql_tasks[0]); // creates data formath with side data
+        var results = yield (0, select_request_js_1.default)(sql_tasks[0]); // creates data formath with side data
         for (var res of results) {
             var task_arr = [];
             for (let index = 1; index <= sql_tasks.length - 1; index++) {
-                task_arr.push(yield (0, select_js_1.default)(sql_tasks[index].replace("$", "'" + res.id + "'")));
+                task_arr.push(yield (0, select_request_js_1.default)(sql_tasks[index].replace("$", "'" + res.id + "'")));
             }
             var record_side_data_arr = (yield Promise.all(task_arr));
             record_side_data_arr.unshift([res]);

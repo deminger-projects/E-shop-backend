@@ -5,6 +5,7 @@ export const pool = mysql.createPool({
     user: 'sql11688724',
     password: 'csKL9csea4',
     database: 'sql11688724',   
+    port: 3306,
     connectionLimit: 10,
     multipleStatements: false
   })
@@ -17,4 +18,4 @@ export const pool = mysql.createPool({
 //   database: 'eshop_2022',   
 //   connectionLimit: 10,
 //   multipleStatements: false
-// })
+// }) 

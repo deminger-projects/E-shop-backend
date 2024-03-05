@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 
 import sql_select from "../../model/sql/select.js";
+import select_request from '../../DB/select_request.js';
 
 export default async function write_json (sql_tasks: Array<string>, file: string){ // gets data from DB and imports them to json file
 
@@ -8,12 +9,13 @@ export default async function write_json (sql_tasks: Array<string>, file: string
 
   var prom_arr: Array<Array<object>> = []
 
-  var results = await sql_select(sql_tasks[0])                            // creates data formath with side data
-  
+  var results = await select_request(sql_tasks[0])                            // creates data formath with side data
+
   for(var res of results){
     var task_arr: Array<object> = []
     for (let index = 1; index <= sql_tasks.length - 1; index++) {
-      task_arr.push(await sql_select(sql_tasks[index].replace("$", "'" + res.id + "'")))  
+      task_arr.push(await select_request(sql_tasks[index].replace("$", "'" + res.id + "'"))
+      )  
     }
     
     var record_side_data_arr = (await Promise.all(task_arr))

@@ -16,8 +16,10 @@ app.use(body_parser_1.default.urlencoded({ extended: true })); //support parsing
 app.use(body_parser_1.default.json()); // support parsing of application/json type post data
 app.use((0, express_fileupload_1.default)()); //file support
 app.use('/', routes_js_1.router); // pristupuje k app.post/get requestum
+console.log("node js jedo more");
+//process.env.PORT
 (0, update_not_user_data_js_1.default)().then(result => {
-    app.listen(8001, () => {
+    app.listen(3306, () => {
         console.log("Server running successfully on 8001");
     });
 });

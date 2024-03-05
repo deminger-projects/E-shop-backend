@@ -1,6 +1,6 @@
 import { pool } from "./pool";
 
-export default function select_request(sql: string, values: Array<string>){
+export default function select_request(sql: string, values?: Array<string>){
 
     return new Promise<Array<{id: number, [index: number]: Array<string>}>>((resolve, reject) => {
 
