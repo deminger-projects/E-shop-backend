@@ -17,9 +17,11 @@ app.use(fileUpload())   //file support
 
 app.use('/', router)  // pristupuje k app.post/get requestum
 
+console.log("node js jedo more")
+
 update_not_user_data().then(
   result => {
-  app.listen(process.env.PORT || 8001, () => {          // zapne server na portu 8001
+  app.listen(process.env.PORT, () => {          // zapne server na portu 8001
     console.log("Server running successfully on 8001");
   })
 })
