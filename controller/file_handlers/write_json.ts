@@ -57,6 +57,8 @@ export default async function write_json (sql_tasks: Array<string>, file: string
       }
     new_data.push(temp_arr)    
   }
+
+  console.log(new_data)
     
   fs.writeFile(file, JSON.stringify(new_data), {encoding: "utf8"}, (err) => { // writes data to file
     if (err) {
