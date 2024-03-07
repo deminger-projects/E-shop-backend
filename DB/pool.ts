@@ -12,7 +12,7 @@ import * as mysql from "mysql"
 
 
   export const pool = mysql.createPool({
-    host: '  srv1342.hstgr.io',
+    host: 'srv1342.hstgr.io',
     user: 'u976476949_pepa',
     password: '!Nevim130',
     database: 'u976476949_joynda_shop',   
