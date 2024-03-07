@@ -209,7 +209,13 @@ export const router = Router()
 
 
 
+  router.post('/test_request', try_catch(async function (req: Request, res: Response) {   
 
+    console.log("test jo")
+
+    res.send({msg: "test", next_status: true, status: true})
+
+  }))
 
 
 
