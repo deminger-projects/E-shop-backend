@@ -14,7 +14,7 @@ import * as mysql from "mysql"
   export const pool = mysql.createPool({
     host: 'srv1342.hstgr.io',
     user: 'u976476949_pepa',
-    password: '!Nevim130',
+    password: '+z&EeSLR0U',
     database: 'u976476949_joynda_shop',   
     connectionLimit: 10,
     multipleStatements: false
