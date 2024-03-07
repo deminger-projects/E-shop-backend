@@ -15,8 +15,9 @@ const request_data_transformer = (req, res, next) => __awaiter(void 0, void 0, v
     var columns = [];
     var values = [];
     for (var table_data of Object.values(records)) {
-        columns.push(Object.keys(table_data));
-        values.push(Object.values(table_data));
+        let data = table_data;
+        columns.push(Object.keys(data));
+        values.push(Object.values(data));
     }
     var where_cols = [];
     var where_vals = [];

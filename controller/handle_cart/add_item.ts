@@ -1,6 +1,6 @@
 import * as fs from "fs"
 
-export default function add_item(product: object, selected_size: object){
+export default function add_item(product: any, selected_size: any){
 
     var my_data = JSON.parse(fs.readFileSync('../client/src/data/cart.json', "utf-8"));
 
