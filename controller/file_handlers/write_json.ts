@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import sql_select from "../../model/sql/select.js";
 import select_request from '../../DB/select_request.js';
 
-export default async function write_json (sql_tasks: Array<string>, file: string){ // gets data from DB and imports them to json file
+export default async function write_json (sql_tasks: Array<string>, file?: string){ // gets data from DB and imports them to json file
 
   var table_names: Array<string> = []
 
@@ -58,12 +58,15 @@ export default async function write_json (sql_tasks: Array<string>, file: string
     new_data.push(temp_arr)    
   }
 
-  console.log(new_data)
+  if(file){
+    fs.writeFile(file, JSON.stringify(new_data), {encoding: "utf8"}, (err) => { // writes data to file
+      if (err) {
+        console.log("🚀 ~ file: write_json.ts:25 ~ fs.writeFile ~ err:", err.message)
+      } 
+      console.log('Successfully wrote file: ' + file)
+    })  
+  }
     
-  fs.writeFile(file, JSON.stringify(new_data), {encoding: "utf8"}, (err) => { // writes data to file
-    if (err) {
-      console.log("🚀 ~ file: write_json.ts:25 ~ fs.writeFile ~ err:", err.message)
-    } 
-    console.log('Successfully wrote file: ' + file)
-  })  
+  return JSON.stringify(new_data)
+  
 }

@@ -78,12 +78,15 @@ function write_json(sql_tasks, file) {
             }
             new_data.push(temp_arr);
         }
-        fs.writeFile(file, JSON.stringify(new_data), { encoding: "utf8" }, (err) => {
-            if (err) {
-                console.log("🚀 ~ file: write_json.ts:25 ~ fs.writeFile ~ err:", err.message);
-            }
-            console.log('Successfully wrote file: ' + file);
-        });
+        if (file) {
+            fs.writeFile(file, JSON.stringify(new_data), { encoding: "utf8" }, (err) => {
+                if (err) {
+                    console.log("🚀 ~ file: write_json.ts:25 ~ fs.writeFile ~ err:", err.message);
+                }
+                console.log('Successfully wrote file: ' + file);
+            });
+        }
+        return JSON.stringify(new_data);
     });
 }
 exports.default = write_json;

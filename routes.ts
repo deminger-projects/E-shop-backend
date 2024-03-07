@@ -27,6 +27,8 @@ import update_admin_data from "./controller/file_handlers/updates/update_admin_d
 import udpade_user_data from "./controller/file_handlers/updates/update_user_data.js";
 import empty_cart from "./controller/handle_cart/empty_cart.js";
 import refund_request_validation from "./controller/middleware/refund_request_validation.js";
+import get_products from "./controller/file_handlers/gettets/get_products.js";
+import write_json from "./controller/file_handlers/write_json.js";
 
 export const router = Router()  
 
@@ -211,9 +213,11 @@ export const router = Router()
 
   router.post('/test_request', try_catch(async function (req: Request, res: Response) {   
 
-    console.log("test jo")
+    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';", 
+    
+    "SELECT product_sizes.size, product_sizes.current_amount FROM product_sizes WHERE product_sizes.product_id = $ ;", "SELECT product_images.image_url FROM product_images WHERE product_images.product_id = $ ;"])])
 
-    res.send({msg: "test", next_status: true, status: true})
+    res.send(JSON.parse(data))
 
   }))
 

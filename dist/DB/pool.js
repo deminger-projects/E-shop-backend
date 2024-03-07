@@ -25,12 +25,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pool = void 0;
 const mysql = __importStar(require("mysql"));
+// export const pool = mysql.createPool({
+//     host: 'viaduct.proxy.rlwy.net',
+//     user: 'root',
+//     password: '5c5hbH22f3dddAF-D23D6-545CGbGdf2',
+//     database: 'railway',   
+//     port: 43545,
+//     connectionLimit: 10,
+//     multipleStatements: false
+//   })
 exports.pool = mysql.createPool({
-    host: 'viaduct.proxy.rlwy.net',
-    user: 'root',
-    password: '5c5hbH22f3dddAF-D23D6-545CGbGdf2',
-    database: 'railway',
-    port: 43545,
+    host: 'srv1342.hstgr.io',
+    user: 'u976476949_pepa',
+    password: '4oVEqeZ!',
+    database: 'u976476949_joynda_shop',
     connectionLimit: 10,
     multipleStatements: false
 });
