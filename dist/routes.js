@@ -168,6 +168,12 @@ exports.router.post('/refund_request', request_data_transformer_js_1.default, ch
         res.send({ msg: "order found", next_status: true, status: true, code: code, data: { refunds: [req.body.order_data[0]], order_products: refund_products } });
     });
 }));
+exports.router.post('/test_request', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("test jo");
+        res.send({ msg: "test", next_status: true, status: true });
+    });
+}));
 exports.router.post('/send_aut_code', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var code = Math.floor(100000 + Math.random() * 900000).toString();

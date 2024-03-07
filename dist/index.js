@@ -19,7 +19,7 @@ app.use('/', routes_js_1.router); // pristupuje k app.post/get requestum
 console.log("node js jedo more");
 //process.env.PORT
 (0, update_not_user_data_js_1.default)().then(result => {
-    app.listen(3306, () => {
+    app.listen(43545, () => {
         console.log("Server running successfully on 8001");
     });
 });
