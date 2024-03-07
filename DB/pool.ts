@@ -1,11 +1,11 @@
 import * as mysql from "mysql"
 
 export const pool = mysql.createPool({
-    host: 'sql11.freesqldatabase.com	',
-    user: 'sql11688724',
-    password: 'csKL9csea4',
-    database: 'sql11688724',   
-    port: 3306,
+    host: 'viaduct.proxy.rlwy.net',
+    user: 'root',
+    password: '5c5hbH22f3dddAF-D23D6-545CGbGdf2',
+    database: 'railway',   
+    port: 43545,
     connectionLimit: 10,
     multipleStatements: false
   })

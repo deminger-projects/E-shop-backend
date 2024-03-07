@@ -23,7 +23,7 @@ console.log("node js jedo more")
 
 update_not_user_data().then(
   result => {
-  app.listen(3306, () => {          // zapne server na portu 8001
+  app.listen(43545, () => {          // zapne server na portu 8001
     console.log("Server running successfully on 8001");
   })
 })
