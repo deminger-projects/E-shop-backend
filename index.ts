@@ -15,6 +15,8 @@ app.use(bp.urlencoded({extended: true}));   //support parsing of application/x-w
 app.use(bp.json())    // support parsing of application/json type post data
 app.use(fileUpload())   //file support
 
+app.use(express.static('public'))
+
 app.use('/', router)  // pristupuje k app.post/get requestum
 
 console.log("node js jedo more")
@@ -23,9 +25,6 @@ console.log("node js jedo more")
 //4354
 //8001
 
-update_not_user_data().then(
-  result => {
-  app.listen(4354, () => {          // zapne server na portu 8001
-    console.log("Server running successfully on 8001");
-  })
+app.listen(4354, () => {          // zapne server na portu 8001
+  console.log("Server running successfully on 8001");
 })

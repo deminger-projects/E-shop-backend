@@ -69,7 +69,7 @@ exports.router.post('/add_record', request_data_transformer_js_1.default, check_
         const transformed_data = req.body.transformed_data;
         var record_id = yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
         if (req.files) {
-            yield (0, save_files_js_1.default)("../client/public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files);
+            yield (0, save_files_js_1.default)("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files);
         }
         if (req.body.user_id) {
             if (req.body.user_id == process.env.ADMIN_ID) {
@@ -169,6 +169,13 @@ exports.router.post('/refund_request', request_data_transformer_js_1.default, ch
         res.send({ msg: "order found", next_status: true, status: true, code: code, data: { refunds: [req.body.order_data[0]], order_products: refund_products } });
     });
 }));
+exports.router.post('/send_aut_code', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var code = Math.floor(100000 + Math.random() * 900000).toString();
+        (0, send_emails_js_1.default)([req.body.transformed_data.email], code);
+        res.send({ msg: "order found", next_status: true, status: true, code: code, record_id: req.body.user_id_auth });
+    });
+}));
 exports.router.post('/test_request', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';",
@@ -176,11 +183,11 @@ exports.router.post('/test_request', (0, try_catch_js_1.default)(function (req, 
         res.send(JSON.parse(data));
     });
 }));
-exports.router.post('/send_aut_code', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
+exports.router.post('/get_product_by_id', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        var code = Math.floor(100000 + Math.random() * 900000).toString();
-        (0, send_emails_js_1.default)([req.body.transformed_data.email], code);
-        res.send({ msg: "order found", next_status: true, status: true, code: code, record_id: req.body.user_id_auth });
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND products.id = " + JSON.parse(req.body.id) + " AND product_images.image_url like '%_main.%';",
+                "SELECT product_sizes.size, product_sizes.current_amount FROM product_sizes WHERE product_sizes.product_id = $ ;", "SELECT product_images.image_url FROM product_images WHERE product_images.product_id = $ ;"])]);
+        res.send(JSON.parse(data));
     });
 }));
 exports.router.use(error_handler_js_1.default);

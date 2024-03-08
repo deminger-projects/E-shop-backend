@@ -3,7 +3,7 @@ import { FileArray, UploadedFile } from "express-fileupload";
 
 export default async function update_files(file_names_to_keep: Array<string>, folder: string, record_id:number, files?: FileArray){
     
-    var path = "../client/public/images/" + folder + "/" + record_id
+    var path = "./public/images/" + folder + "/" + record_id
 
     fs.readdir(path, (err, data) => {
         if(err){

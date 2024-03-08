@@ -82,7 +82,7 @@ export const router = Router()
     var record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
     if(req.files){
-      await save_files("../client/public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files)
+      await save_files("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files)
     }
 
     if(req.body.user_id){
@@ -211,6 +211,20 @@ export const router = Router()
 
 
 
+  router.post('/send_aut_code', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) {   
+
+    var code = Math.floor(100000 + Math.random() * 900000).toString()
+
+    send_emails([req.body.transformed_data.email], code)
+
+    res.send({msg: "order found", next_status: true, status: true, code: code, record_id: req.body.user_id_auth})
+
+  }))
+
+
+
+
+
   router.post('/test_request', try_catch(async function (req: Request, res: Response) {   
 
     var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';", 
@@ -222,16 +236,31 @@ export const router = Router()
   }))
 
 
+  router.post('/get_product_by_id', try_catch(async function (req: Request, res: Response) {   
 
+    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND products.id = " + JSON.parse(req.body.id) + " AND product_images.image_url like '%_main.%';", 
+    
+    "SELECT product_sizes.size, product_sizes.current_amount FROM product_sizes WHERE product_sizes.product_id = $ ;", "SELECT product_images.image_url FROM product_images WHERE product_images.product_id = $ ;"])])
 
-  router.post('/send_aut_code', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) {   
-
-    var code = Math.floor(100000 + Math.random() * 900000).toString()
-
-    send_emails([req.body.transformed_data.email], code)
-
-    res.send({msg: "order found", next_status: true, status: true, code: code, record_id: req.body.user_id_auth})
+    res.send(JSON.parse(data))
 
   }))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   router.use(error_handler)

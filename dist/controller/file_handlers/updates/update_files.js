@@ -35,7 +35,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 function update_files(file_names_to_keep, folder, record_id, files) {
     return __awaiter(this, void 0, void 0, function* () {
-        var path = "../client/public/images/" + folder + "/" + record_id;
+        var path = "./public/images/" + folder + "/" + record_id;
         fs.readdir(path, (err, data) => {
             if (err) {
                 console.log("🚀 ~ file: update_files.ts:10 ~ fs.readdir ~ err:", err.message);
