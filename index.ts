@@ -29,7 +29,8 @@ console.log("node js jedo more")
 //   console.log("Server running successfully on 8001");
 // })
 
-// Listen on `port` and 0.0.0.0
-app.listen(3000, "0.0.0.0", function () {
-  console.log("server on port 3000")
+const port = process.env.PORT || 4000;
+
+app.listen(port, function () {
+  console.log("server on port " + port)
 });
