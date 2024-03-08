@@ -247,19 +247,27 @@ export const router = Router()
   }))
 
 
+  router.post('/get_admin_collections', try_catch(async function (req: Request, res: Response) {   
+
+    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
+    "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+
+    res.send(JSON.parse(data))
+
+  }))
 
 
 
+  router.post('/get_admin_products', try_catch(async function (req: Request, res: Response) {   
 
+    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';", 
+    
+    "SELECT product_sizes.size, product_sizes.current_amount FROM product_sizes WHERE product_sizes.product_id = $ ;", "SELECT product_images.image_url FROM product_images WHERE product_images.product_id = $ ;"])])
 
+    res.send(JSON.parse(data))
 
-
-
-
-
-
-
-
+  }))
+  
 
 
 
