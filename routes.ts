@@ -233,6 +233,14 @@ export const router = Router()
 
   }))
 
+  
+  router.get('/', (req, res) => {   
+
+    console.log("prvni get request")
+    res.send("vracim prvni request")
+
+  })
+
 
 
 
