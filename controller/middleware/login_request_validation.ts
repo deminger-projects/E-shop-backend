@@ -29,7 +29,7 @@ const login_request_validation = async(req: Request, res: Response, next: NextFu
         return next(new Error("wrong password"))
      }
 
-    req.body.login_request_validation = {msg: "correct data for login", next_status: true, user_id: psw_test_result[0].id}
+    req.body.login_request_validation = {msg: "correct data for login", next_status: true, user_id: psw_test_result[0].id, user_data: psw_test_result}
    
     next()
 }

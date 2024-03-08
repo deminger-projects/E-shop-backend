@@ -33,7 +33,7 @@ const login_request_validation = (req, res, next) => __awaiter(void 0, void 0, v
     if (psw_test_result.length <= 0) {
         return next(new Error("wrong password"));
     }
-    req.body.login_request_validation = { msg: "correct data for login", next_status: true, user_id: psw_test_result[0].id };
+    req.body.login_request_validation = { msg: "correct data for login", next_status: true, user_id: psw_test_result[0].id, user_data: psw_test_result };
     next();
 });
 exports.default = login_request_validation;

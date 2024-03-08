@@ -20,6 +20,10 @@ console.log("node js jedo more");
 //process.env.PORT
 //4354
 //8001
-app.listen(8001, () => {
-    console.log("Server running successfully on 8001");
+// app.listen(8001, () => {          // zapne server na portu 8001
+//   console.log("Server running successfully on 8001");
+// })
+const port = process.env.PORT || 4000;
+app.listen(port, function () {
+    console.log("server on port " + port);
 });

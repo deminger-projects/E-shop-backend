@@ -36,14 +36,17 @@ export const router = Router()
 
     await update_records(["users"], [["login_status"]], [[["Active"]]], req.body.login_request_validation.user_id)
 
-    if(req.body.login_request_validation.user_id == process.env.ADMIN_ID){
-      console.log("admin")
-      await update_admin_data(req.body.login_request_validation.user_id)
-    }else{
-      await udpade_user_data(req.body.login_request_validation.user_id)
-    }
+    const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", req.body.login_request_validation.user_id)
 
-    res.send({msg: "user loged in", next_status: true, status: true})
+    const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.login_request_validation.user_id)
+    
+    // if(req.body.login_request_validation.user_id == process.env.ADMIN_ID){
+    //   await update_admin_data(req.body.login_request_validation.user_id)
+    // }else{
+    //   await udpade_user_data(req.body.login_request_validation.user_id)
+    // }
+
+    res.send({msg: "user loged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
 
   }))
  
@@ -51,9 +54,13 @@ export const router = Router()
 
     await update_records(["users"], [["login_status"]], [[["Inactive"]]], req.body.record_id)
 
-    await update_login_data(req.body.user_id)
+    const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", req.body.record_id)
 
-    res.send({msg: "user loged off", next_status: true, status: true})
+    const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.record_id)
+
+    // await update_login_data(req.body.user_id)
+
+    res.send({msg: "user loged off", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data })
 
   }))
 
@@ -64,9 +71,14 @@ export const router = Router()
 
     const record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
-    await udpade_user_data(Number(record_id))
+    const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", [record_id.toString()])
 
-    res.send({msg: "user registred", next_status: true, status: true})
+    const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", [record_id.toString()])
+
+
+    // await udpade_user_data(Number(record_id))
+
+    res.send({msg: "user registred", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
 
   }))
 
@@ -289,7 +301,26 @@ export const router = Router()
     res.send(JSON.parse(data))
 
   }))
+
+  router.post('/get_admin_orders', try_catch(async function (req: Request, res: Response) {   
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders;", 
+    
+    "SELECT order_products.id, order_products.product_id, order_products.size, order_products.amount, products.name, products.price, products.discount, products.collection_id, products.description FROM order_products JOIN products ON products.id = product_id WHERE order_id = $ ;"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
   
+
+  router.post('/get_collections', try_catch(async function (req: Request, res: Response) {   
+
+    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
+    "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
 
 
 
