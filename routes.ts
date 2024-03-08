@@ -226,7 +226,7 @@ export const router = Router()
 
 
 
-  router.post('/tet', try_catch(async function (req: Request, res: Response) {   
+  router.get('/tet', try_catch(async function (req: Request, res: Response) {   
 
     console.log("prvni get request")
     res.send("vracim prvni request")
