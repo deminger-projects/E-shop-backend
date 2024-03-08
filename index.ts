@@ -25,6 +25,11 @@ console.log("node js jedo more")
 //4354
 //8001
 
-app.listen(8001, () => {          // zapne server na portu 8001
-  console.log("Server running successfully on 8001");
-})
+// app.listen(8001, () => {          // zapne server na portu 8001
+//   console.log("Server running successfully on 8001");
+// })
+
+// Listen on `port` and 0.0.0.0
+app.listen(3000, "0.0.0.0", function () {
+  console.log("server on port 3000")
+});
