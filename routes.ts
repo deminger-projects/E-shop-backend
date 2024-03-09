@@ -46,6 +46,9 @@ export const router = Router()
     //   await udpade_user_data(req.body.login_request_validation.user_id)
     // }
 
+    console.log("🚀 ~ req.body.login_request_validation.user_id:", req.body.login_request_validation.user_id)
+
+
     res.send({msg: "user loged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
 
   }))
@@ -57,6 +60,8 @@ export const router = Router()
     const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", req.body.record_id)
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.record_id)
+
+    console.log("🚀 ~ req.body.record_id:", req.body.record_id)
 
     // await update_login_data(req.body.user_id)
 
@@ -72,8 +77,10 @@ export const router = Router()
     const record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
     const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", [record_id.toString()])
+    //console.log("🚀 ~ user_data:", user_data)
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", [record_id.toString()])
+      console.log("🚀 ~ user_account_data:", user_account_data)
 
 
     // await udpade_user_data(Number(record_id))

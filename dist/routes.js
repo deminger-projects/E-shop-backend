@@ -45,6 +45,7 @@ exports.router.post('/login_request', request_data_transformer_js_1.default, log
         // }else{
         //   await udpade_user_data(req.body.login_request_validation.user_id)
         // }
+        console.log("🚀 ~ req.body.login_request_validation.user_id:", req.body.login_request_validation.user_id);
         res.send({ msg: "user loged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
     });
 }));
@@ -53,6 +54,7 @@ exports.router.post('/logoff_request', request_data_transformer_js_1.default, (0
         yield (0, update_records_js_1.default)(["users"], [["login_status"]], [[["Inactive"]]], req.body.record_id);
         const user_data = yield (0, select_request_js_1.default)("SELECT id, username, email, password, login_status FROM users WHERE id = ?", req.body.record_id);
         const user_account_data = yield (0, select_request_js_1.default)("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.record_id);
+        console.log("🚀 ~ req.body.record_id:", req.body.record_id);
         // await update_login_data(req.body.user_id)
         res.send({ msg: "user loged off", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
     });
@@ -62,7 +64,9 @@ exports.router.post('/register_request', request_data_transformer_js_1.default, 
         const transformed_data = req.body.transformed_data;
         const record_id = yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
         const user_data = yield (0, select_request_js_1.default)("SELECT id, username, email, password, login_status FROM users WHERE id = ?", [record_id.toString()]);
+        //console.log("🚀 ~ user_data:", user_data)
         const user_account_data = yield (0, select_request_js_1.default)("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", [record_id.toString()]);
+        console.log("🚀 ~ user_account_data:", user_account_data);
         // await udpade_user_data(Number(record_id))
         res.send({ msg: "user registred", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
     });
