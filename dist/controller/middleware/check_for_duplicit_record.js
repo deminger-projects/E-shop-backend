@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const select_request_1 = __importDefault(require("../../DB/select_request"));
 const check_for_duplicit_record = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const data = req.body.transformed_data;
+    console.log("🚀 ~ constcheck_for_duplicit_record=async ~ data:", data);
     var where_conditions = "";
     for (let index = 0; index < data.wheres.columns.length; index++) {
         if (data.wheres.columns.length - 1 === index) {

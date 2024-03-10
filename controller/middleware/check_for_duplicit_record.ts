@@ -4,6 +4,7 @@ import select_request from "../../DB/select_request";
 const check_for_duplicit_record = async(req: Request, res: Response, next: NextFunction) => {
    
     const data = req.body.transformed_data
+    console.log("🚀 ~ constcheck_for_duplicit_record=async ~ data:", data)
 
     var where_conditions = ""
 

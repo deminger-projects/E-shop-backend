@@ -32,7 +32,6 @@ function insert_records(tables, columns, values) {
         var record_id;
         for (let query_index = 0; query_index < tables.length; query_index++) {
             if (query_index === 0) {
-                console.log(sql_inserts[query_index], [values[query_index]]);
                 const result = yield (0, insert_request_1.default)(sql_inserts[query_index], [values[query_index]]);
                 record_id = result.last_inseted_id;
             }

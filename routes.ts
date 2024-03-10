@@ -104,19 +104,19 @@ export const router = Router()
       await save_files("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files)
     }
 
-    if(req.body.user_id){
-      if(req.body.user_id == process.env.ADMIN_ID){
-        await update_admin_data(req.body.user_id)
-      }else{
-        await udpade_user_data(req.body.user_id)
-      }
-    }else{
-      await update_not_user_data()
-    }
+    // if(req.body.user_id){
+    //   if(req.body.user_id == process.env.ADMIN_ID){
+    //     await update_admin_data(req.body.user_id)
+    //   }else{
+    //     await udpade_user_data(req.body.user_id)
+    //   }
+    // }else{
+    //   await update_not_user_data()
+    // }
 
-    if(req.body.order){
-      empty_cart()
-    }
+    // if(req.body.order){
+    //   empty_cart()
+    // }
 
     res.send({msg: "record added", next_status: true, status: true})
 
@@ -162,15 +162,15 @@ export const router = Router()
 
     await update_records(transformed_data.tables, transformed_data.columns, transformed_data.values, req.body.record_id)
  
-    if(req.body.user_id){
-      if(req.body.user_id == process.env.ADMIN_ID){
-        await update_admin_data(req.body.user_id)
-      }else{
-        await udpade_user_data(req.body.user_id)
-      }
-    }else{
-      await update_not_user_data()
-    }
+    // if(req.body.user_id){
+    //   if(req.body.user_id == process.env.ADMIN_ID){
+    //     await update_admin_data(req.body.user_id)
+    //   }else{
+    //     await udpade_user_data(req.body.user_id)
+    //   }
+    // }else{
+    //   await update_not_user_data()
+    // }
 
     res.send({msg: "status changed", next_status: true, status: true})
 
@@ -231,6 +231,8 @@ export const router = Router()
 
 
   router.post('/send_aut_code', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) {   
+
+    console.log("change ", req.body)
 
     var code = Math.floor(100000 + Math.random() * 900000).toString()
 
@@ -314,7 +316,19 @@ export const router = Router()
     var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders;", 
     
     "SELECT order_products.id, order_products.product_id, order_products.size, order_products.amount, products.name, products.price, products.discount, products.collection_id, products.description FROM order_products JOIN products ON products.id = product_id WHERE order_id = $ ;"])])
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_placed_orders', try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";", 
     
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    console.log("🚀 ~ data:", data)
+
     res.send(JSON.parse(data))
 
   }))
@@ -329,6 +343,69 @@ export const router = Router()
 
   }))
 
+  router.post('/get_user_refunds', try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
+    
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_user_acccount_data', try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT users.id, users.username, users.email, users.password FROM users WHERE users.id = " + id + " ;", 
+    
+    "SELECT user_data.id, user_data.user_id, user_data.name, user_data.surname, user_data.phone, user_data.adress, user_data.city, user_data.postcode, user_data.status, users.email FROM user_data JOIN users ON users.id = user_data.user_id WHERE user_id = " + id + " AND status = 'Active';"])])
+
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_user_avaible_returns', try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
+    
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_user_place_returns', try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + " && (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status != 'Cancled') < 1;",
+    
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_admin_refunds', try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT refunds.id, orders.id as order_id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders on refunds.order_id = orders.id;",
+    
+    "SELECT refund_products.product_id, refund_products.amount, refund_products.size, products.name, refund_reasons.reason, products.price FROM refund_products JOIN products ON products.id = refund_products.product_id JOIN refund_reasons ON refund_reasons.id = refund_products.reason_id JOIN refunds ON refunds.id = refund_products.refund_id WHERE refunds.id = $ ;"])])
+
+    res.send(JSON.parse(data))
+
+  }))
+
+  
 
 
   router.use(error_handler)
+
+  

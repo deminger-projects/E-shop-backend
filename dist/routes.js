@@ -31,7 +31,6 @@ const select_request_js_1 = __importDefault(require("./DB/select_request.js"));
 const update_not_user_data_js_1 = __importDefault(require("./controller/file_handlers/updates/update_not_user_data.js"));
 const update_admin_data_js_1 = __importDefault(require("./controller/file_handlers/updates/update_admin_data.js"));
 const update_user_data_js_1 = __importDefault(require("./controller/file_handlers/updates/update_user_data.js"));
-const empty_cart_js_1 = __importDefault(require("./controller/handle_cart/empty_cart.js"));
 const refund_request_validation_js_1 = __importDefault(require("./controller/middleware/refund_request_validation.js"));
 const write_json_js_1 = __importDefault(require("./controller/file_handlers/write_json.js"));
 exports.router = (0, express_1.Router)();
@@ -78,20 +77,18 @@ exports.router.post('/add_record', request_data_transformer_js_1.default, check_
         if (req.files) {
             yield (0, save_files_js_1.default)("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files);
         }
-        if (req.body.user_id) {
-            if (req.body.user_id == process.env.ADMIN_ID) {
-                yield (0, update_admin_data_js_1.default)(req.body.user_id);
-            }
-            else {
-                yield (0, update_user_data_js_1.default)(req.body.user_id);
-            }
-        }
-        else {
-            yield (0, update_not_user_data_js_1.default)();
-        }
-        if (req.body.order) {
-            (0, empty_cart_js_1.default)();
-        }
+        // if(req.body.user_id){
+        //   if(req.body.user_id == process.env.ADMIN_ID){
+        //     await update_admin_data(req.body.user_id)
+        //   }else{
+        //     await udpade_user_data(req.body.user_id)
+        //   }
+        // }else{
+        //   await update_not_user_data()
+        // }
+        // if(req.body.order){
+        //   empty_cart()
+        // }
         res.send({ msg: "record added", next_status: true, status: true });
     });
 }));
@@ -131,17 +128,15 @@ exports.router.post('/change_record_status', request_data_transformer_js_1.defau
     return __awaiter(this, void 0, void 0, function* () {
         const transformed_data = req.body.transformed_data;
         yield (0, update_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values, req.body.record_id);
-        if (req.body.user_id) {
-            if (req.body.user_id == process.env.ADMIN_ID) {
-                yield (0, update_admin_data_js_1.default)(req.body.user_id);
-            }
-            else {
-                yield (0, update_user_data_js_1.default)(req.body.user_id);
-            }
-        }
-        else {
-            yield (0, update_not_user_data_js_1.default)();
-        }
+        // if(req.body.user_id){
+        //   if(req.body.user_id == process.env.ADMIN_ID){
+        //     await update_admin_data(req.body.user_id)
+        //   }else{
+        //     await udpade_user_data(req.body.user_id)
+        //   }
+        // }else{
+        //   await update_not_user_data()
+        // }
         res.send({ msg: "status changed", next_status: true, status: true });
     });
 }));
@@ -178,6 +173,7 @@ exports.router.post('/refund_request', request_data_transformer_js_1.default, ch
 }));
 exports.router.post('/send_aut_code', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("change ", req.body);
         var code = Math.floor(100000 + Math.random() * 900000).toString();
         (0, send_emails_js_1.default)([req.body.transformed_data.email], code);
         res.send({ msg: "order found", next_status: true, status: true, code: code, record_id: req.body.user_id_auth });
@@ -228,10 +224,59 @@ exports.router.post('/get_admin_orders', (0, try_catch_js_1.default)(function (r
         res.send(JSON.parse(data));
     });
 }));
+exports.router.post('/get_placed_orders', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";",
+                "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
+        console.log("🚀 ~ data:", data);
+        res.send(JSON.parse(data));
+    });
+}));
 exports.router.post('/get_collections', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
                 "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])]);
+        res.send(JSON.parse(data));
+    });
+}));
+exports.router.post('/get_user_refunds', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
+                "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
+        res.send(JSON.parse(data));
+    });
+}));
+exports.router.post('/get_user_acccount_data', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT users.id, users.username, users.email, users.password FROM users WHERE users.id = " + id + " ;",
+                "SELECT user_data.id, user_data.user_id, user_data.name, user_data.surname, user_data.phone, user_data.adress, user_data.city, user_data.postcode, user_data.status, users.email FROM user_data JOIN users ON users.id = user_data.user_id WHERE user_id = " + id + " AND status = 'Active';"])]);
+        res.send(JSON.parse(data));
+    });
+}));
+exports.router.post('/get_user_avaible_returns', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
+                "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
+        res.send(JSON.parse(data));
+    });
+}));
+exports.router.post('/get_user_place_returns', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + " && (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status != 'Cancled') < 1;",
+                "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
+        res.send(JSON.parse(data));
+    });
+}));
+exports.router.post('/get_admin_refunds', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT refunds.id, orders.id as order_id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders on refunds.order_id = orders.id;",
+                "SELECT refund_products.product_id, refund_products.amount, refund_products.size, products.name, refund_reasons.reason, products.price FROM refund_products JOIN products ON products.id = refund_products.product_id JOIN refund_reasons ON refund_reasons.id = refund_products.reason_id JOIN refunds ON refunds.id = refund_products.refund_id WHERE refunds.id = $ ;"])]);
         res.send(JSON.parse(data));
     });
 }));

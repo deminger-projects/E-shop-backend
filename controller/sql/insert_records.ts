@@ -28,7 +28,6 @@ export default async function insert_records(tables: Array<string>, columns: Arr
 
     for (let query_index = 0; query_index < tables.length; query_index++) {
         if(query_index === 0){
-            console.log(sql_inserts[query_index], [values[query_index]])
 
             const result = await insert_request(sql_inserts[query_index], [values[query_index]])
             record_id = result.last_inseted_id
