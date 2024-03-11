@@ -280,4 +280,12 @@ exports.router.post('/get_admin_refunds', (0, try_catch_js_1.default)(function (
         res.send(JSON.parse(data));
     });
 }));
+exports.router.post('/get_refund_reasons', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT id, reason FROM refund_reasons"])]);
+        console.log("🚀 ~ data:", data);
+        res.send(JSON.parse(data));
+    });
+}));
 exports.router.use(error_handler_js_1.default);

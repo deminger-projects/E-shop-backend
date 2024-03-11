@@ -403,7 +403,13 @@ export const router = Router()
 
   }))
 
-  
+  router.post('/get_refund_reasons', try_catch(async function (req: Request, res: Response) {   
+
+    var data: any = await Promise.all([write_json(["SELECT id, reason FROM refund_reasons"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
 
 
   router.use(error_handler)
