@@ -3,6 +3,7 @@
 
 #my shit
 process.env
+.process.env
 
 ### Node ###
 # Logs

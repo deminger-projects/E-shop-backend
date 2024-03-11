@@ -39,15 +39,6 @@ export const router = Router()
     const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", req.body.login_request_validation.user_id)
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.login_request_validation.user_id)
-    
-    // if(req.body.login_request_validation.user_id == process.env.ADMIN_ID){
-    //   await update_admin_data(req.body.login_request_validation.user_id)
-    // }else{
-    //   await udpade_user_data(req.body.login_request_validation.user_id)
-    // }
-
-    console.log("🚀 ~ req.body.login_request_validation.user_id:", req.body.login_request_validation.user_id)
-
 
     res.send({msg: "user loged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
 
@@ -61,10 +52,6 @@ export const router = Router()
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.record_id)
 
-    console.log("🚀 ~ req.body.record_id:", req.body.record_id)
-
-    // await update_login_data(req.body.user_id)
-
     res.send({msg: "user loged off", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data })
 
   }))
@@ -77,14 +64,9 @@ export const router = Router()
     const record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
     const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", [record_id.toString()])
-    //console.log("🚀 ~ user_data:", user_data)
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", [record_id.toString()])
-      console.log("🚀 ~ user_account_data:", user_account_data)
-
-
-    // await udpade_user_data(Number(record_id))
-
+     
     res.send({msg: "user registred", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
 
   }))
@@ -103,20 +85,6 @@ export const router = Router()
     if(req.files){
       await save_files("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files)
     }
-
-    // if(req.body.user_id){
-    //   if(req.body.user_id == process.env.ADMIN_ID){
-    //     await update_admin_data(req.body.user_id)
-    //   }else{
-    //     await udpade_user_data(req.body.user_id)
-    //   }
-    // }else{
-    //   await update_not_user_data()
-    // }
-
-    // if(req.body.order){
-    //   empty_cart()
-    // }
 
     res.send({msg: "record added", next_status: true, status: true})
 
@@ -138,16 +106,6 @@ export const router = Router()
       await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id))
     }
 
-    // if(req.body.user_id){
-    //   if(req.body.user_id == process.env.ADMIN_ID){
-    //     await update_admin_data(req.body.user_id)
-    //   }else{
-    //     await udpade_user_data(req.body.user_id)
-    //   }
-    // }else{
-    //   await update_not_user_data()
-    // }
-
     if(req.body.psw_change){
       res.send({msg: "password changed", next_status: true})
     }
@@ -161,44 +119,12 @@ export const router = Router()
     const transformed_data = req.body.transformed_data
 
     await update_records(transformed_data.tables, transformed_data.columns, transformed_data.values, req.body.record_id)
- 
-    // if(req.body.user_id){
-    //   if(req.body.user_id == process.env.ADMIN_ID){
-    //     await update_admin_data(req.body.user_id)
-    //   }else{
-    //     await udpade_user_data(req.body.user_id)
-    //   }
-    // }else{
-    //   await update_not_user_data()
-    // }
 
     res.send({msg: "status changed", next_status: true, status: true})
 
   }))  
 
 
- 
-
-
-
-
-
-
-  // router.post('/add_to_cart', try_catch(async function (req: Request, res: Response) {   
-
-  //   add_item(JSON.parse(req.body.product), JSON.parse(req.body.selected_size))
-    
-  //   res.send({msg: "added to cart"})
-
-  // }))
-
-  // router.post('/delete_from_cart', try_catch(async function (req: Request, res: Response) {   
-
-  //   delete_item(req.body.pozition)
-    
-  //   res.send({msg: "deleted from cart"})
-
-  // }))
 
 
 
@@ -213,16 +139,6 @@ export const router = Router()
     send_emails([req.body.transformed_data.email], code)
 
     var refund_products = await select_request("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id WHERE order_id = ?;", req.body.order_data[0].id)
-
-    // if(req.body.user_id){
-    //   if(req.body.user_id == process.env.ADMIN_ID){
-    //     await update_admin_data(req.body.user_id)
-    //   }else{
-    //     await udpade_user_data(req.body.user_id)
-    //   }
-    // }else{
-    //   await update_not_user_data()
-    // }
     
     res.send({msg: "order found", next_status: true, status: true, code: code, data: {refunds: [req.body.order_data[0]], order_products: refund_products}})
 
@@ -231,8 +147,6 @@ export const router = Router()
 
 
   router.post('/send_aut_code', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) {   
-
-    console.log("change ", req.body)
 
     var code = Math.floor(100000 + Math.random() * 900000).toString()
 
@@ -244,23 +158,6 @@ export const router = Router()
 
 
 
-
-
-
-  router.get('/tet', try_catch(async function (req: Request, res: Response) {   
-
-    console.log("prvni get request")
-    res.send("vracim prvni request")
-
-  }))
-
-  
-  router.get('/', (req, res) => {   
-
-    console.log("prvni get request")
-    res.send("vracim prvni request")
-
-  })
 
 
 
@@ -338,6 +235,7 @@ export const router = Router()
 
     var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
     "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+    console.log("🚀 ~ data:", data)
     
     res.send(JSON.parse(data))
 
