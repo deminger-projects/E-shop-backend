@@ -138,15 +138,15 @@ export const router = Router()
       await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id))
     }
 
-    if(req.body.user_id){
-      if(req.body.user_id == process.env.ADMIN_ID){
-        await update_admin_data(req.body.user_id)
-      }else{
-        await udpade_user_data(req.body.user_id)
-      }
-    }else{
-      await update_not_user_data()
-    }
+    // if(req.body.user_id){
+    //   if(req.body.user_id == process.env.ADMIN_ID){
+    //     await update_admin_data(req.body.user_id)
+    //   }else{
+    //     await udpade_user_data(req.body.user_id)
+    //   }
+    // }else{
+    //   await update_not_user_data()
+    // }
 
     if(req.body.psw_change){
       res.send({msg: "password changed", next_status: true})
@@ -184,21 +184,21 @@ export const router = Router()
 
 
 
-  router.post('/add_to_cart', try_catch(async function (req: Request, res: Response) {   
+  // router.post('/add_to_cart', try_catch(async function (req: Request, res: Response) {   
 
-    add_item(JSON.parse(req.body.product), JSON.parse(req.body.selected_size))
+  //   add_item(JSON.parse(req.body.product), JSON.parse(req.body.selected_size))
     
-    res.send({msg: "added to cart"})
+  //   res.send({msg: "added to cart"})
 
-  }))
+  // }))
 
-  router.post('/delete_from_cart', try_catch(async function (req: Request, res: Response) {   
+  // router.post('/delete_from_cart', try_catch(async function (req: Request, res: Response) {   
 
-    delete_item(req.body.pozition)
+  //   delete_item(req.body.pozition)
     
-    res.send({msg: "deleted from cart"})
+  //   res.send({msg: "deleted from cart"})
 
-  }))
+  // }))
 
 
 
@@ -214,15 +214,15 @@ export const router = Router()
 
     var refund_products = await select_request("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id WHERE order_id = ?;", req.body.order_data[0].id)
 
-    if(req.body.user_id){
-      if(req.body.user_id == process.env.ADMIN_ID){
-        await update_admin_data(req.body.user_id)
-      }else{
-        await udpade_user_data(req.body.user_id)
-      }
-    }else{
-      await update_not_user_data()
-    }
+    // if(req.body.user_id){
+    //   if(req.body.user_id == process.env.ADMIN_ID){
+    //     await update_admin_data(req.body.user_id)
+    //   }else{
+    //     await udpade_user_data(req.body.user_id)
+    //   }
+    // }else{
+    //   await update_not_user_data()
+    // }
     
     res.send({msg: "order found", next_status: true, status: true, code: code, data: {refunds: [req.body.order_data[0]], order_products: refund_products}})
 
