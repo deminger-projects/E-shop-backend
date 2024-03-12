@@ -8,15 +8,18 @@ require("dotenv").config()
 
 const app: Express = express();
 
-app.use(cors())   //enable the express server to respond to preflight requests
+app.use(cors({
+  // origin: 'https://nodejs-production-ff30.up.railway.app' || 'http://localhost:8001'  
+}))   //enable the express server to respond to preflight requests
 
 app.use(bp.urlencoded({extended: true}));   //support parsing of application/x-www-form-urlencoded post data
 app.use(bp.json())    // support parsing of application/json type post data
 app.use(fileUpload())   //file support
 
-app.use(express.static('public'))
+app.use(express.static('public')) //udeluje pristup k server public dir
 
 app.use('/', router)  // pristupuje k app.post/get requestum
+
 
 const port = process.env.PORT || 4000;
 

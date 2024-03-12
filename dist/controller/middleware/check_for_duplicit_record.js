@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const select_request_1 = __importDefault(require("../../DB/select_request"));
 const check_for_duplicit_record = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const data = req.body.transformed_data;
-    console.log("🚀 ~ constcheck_for_duplicit_record=async ~ data:", data);
     var where_conditions = "";
     for (let index = 0; index < data.wheres.columns.length; index++) {
         if (data.wheres.columns.length - 1 === index) {
@@ -27,18 +26,18 @@ const check_for_duplicit_record = (req, res, next) => __awaiter(void 0, void 0, 
     }
     if (data.wheres.columns.length <= 0) {
         if (req.body.record_id) {
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + req.body.record_id + ";";
+            var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + req.body.record_id + " AND status != 'Deleted';";
         }
         else {
-            var sql = "SELECT * FROM " + data.tables[0] + ";";
+            var sql = "SELECT * FROM " + data.tables[0] + " WHERE status != 'Deleted';";
         }
     }
     else {
         if (req.body.record_id) {
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND id != " + req.body.record_id + ";";
+            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND id != " + req.body.record_id + " AND status != 'Deleted';";
         }
         else {
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + ";";
+            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND status != 'Deleted';";
         }
     }
     const result = yield (0, select_request_1.default)(sql, data.wheres.values);

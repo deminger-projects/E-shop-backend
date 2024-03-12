@@ -29,6 +29,20 @@ const select_request_js_1 = __importDefault(require("./DB/select_request.js"));
 const refund_request_validation_js_1 = __importDefault(require("./controller/middleware/refund_request_validation.js"));
 const write_json_js_1 = __importDefault(require("./controller/file_handlers/write_json.js"));
 exports.router = (0, express_1.Router)();
+exports.router.post('/stripe_create_session', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+        var items = JSON.parse(req.body.items);
+        const session = yield stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            mode: "payment",
+            line_items: items.products.map((item) => { return { price_data: { currency: "usd", product_data: { name: item.name }, unit_amount: item.prize * 100 }, quantity: item.amount }; }),
+            success_url: process.env.SERVER_URL + "/order-completed",
+            cancel_url: process.env.SERVER_URL + "/main"
+        });
+        res.send({ msg: "melo by vratit url stripu", url: session.url, next_status: undefined });
+    });
+}));
 exports.router.post('/login_request', request_data_transformer_js_1.default, login_request_validation_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         yield (0, update_records_js_1.default)(["users"], [["login_status"]], [[["Active"]]], req.body.login_request_validation.user_id);

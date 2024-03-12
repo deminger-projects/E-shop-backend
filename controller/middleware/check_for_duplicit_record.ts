@@ -4,7 +4,6 @@ import select_request from "../../DB/select_request";
 const check_for_duplicit_record = async(req: Request, res: Response, next: NextFunction) => {
    
     const data = req.body.transformed_data
-    console.log("🚀 ~ constcheck_for_duplicit_record=async ~ data:", data)
 
     var where_conditions = ""
 
@@ -18,15 +17,15 @@ const check_for_duplicit_record = async(req: Request, res: Response, next: NextF
 
     if(data.wheres.columns.length <= 0){
         if(req.body.record_id){
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + req.body.record_id + ";"
+            var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + req.body.record_id + " AND status != 'Deleted';"
         }else{
-            var sql = "SELECT * FROM " + data.tables[0] + ";"
+            var sql = "SELECT * FROM " + data.tables[0] + " WHERE status != 'Deleted';"
         }
     }else{
         if(req.body.record_id){
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND id != " + req.body.record_id + ";"
+            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND id != " + req.body.record_id + " AND status != 'Deleted';"
         }else{
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + ";"
+            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND status != 'Deleted';"
         }
     }    
 

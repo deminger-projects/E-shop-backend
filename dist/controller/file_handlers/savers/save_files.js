@@ -33,10 +33,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
+const sharp = require('sharp');
 function save_files(path, files) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("🚀 ~ save_files ~ files:", files);
-        console.log("🚀 ~ save_files ~ path:", path);
         fs.mkdir(path, (err) => {
             if (err) {
                 console.log("🚀 ~ file: save_files.ts:8 ~ fs.mkdir ~ err:", err.message);
@@ -54,6 +53,16 @@ function save_files(path, files) {
                     }
                 }
                 else if (single_file) {
+                    let inputFile = single_file.name;
+                    let outputFile = single_file.name;
+                    sharp(inputFile).resize({ height: 780 }).toFile(outputFile)
+                        .then(function (newFileInfo) {
+                        // newFileInfo holds the output file properties
+                        console.log("Success");
+                    })
+                        .catch(function (err) {
+                        console.log("Error occured");
+                    });
                     single_file.mv(path + "/" + single_file.name, (err) => {
                         if (err) {
                             console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message);

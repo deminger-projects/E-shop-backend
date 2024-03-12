@@ -1,8 +1,5 @@
 import { Router, Request, Response } from "express";
 
-import add_item from "./controller/handle_cart/add_item.js";
-import delete_item from "./controller/handle_cart/delete_item.js";
-
 import error_handler from "./controller/middleware/error_handler.js";
 import try_catch from "./controller/utils/try_catch.js";
 import request_data_transformer from "./controller/middleware/request_data_transformer.js";
@@ -21,16 +18,32 @@ import send_emails from "./controller/other/send_emails.js";
 
 import select_request from "./DB/select_request.js";
 
-import update_login_data from "./controller/file_handlers/updates/update_login_data.js";
-import update_not_user_data from "./controller/file_handlers/updates/update_not_user_data.js";
-import update_admin_data from "./controller/file_handlers/updates/update_admin_data.js";
-import udpade_user_data from "./controller/file_handlers/updates/update_user_data.js";
-import empty_cart from "./controller/handle_cart/empty_cart.js";
 import refund_request_validation from "./controller/middleware/refund_request_validation.js";
-import get_products from "./controller/file_handlers/gettets/get_products.js";
 import write_json from "./controller/file_handlers/write_json.js";
 
+
 export const router = Router()  
+
+
+  router.post('/stripe_create_session', try_catch(async function (req: Request, res: Response) {   
+
+    const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
+
+    var items = JSON.parse(req.body.items)
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: items.products.map((item: any) => {return {price_data: {currency: "usd", product_data: {name: item.name}, unit_amount: item.prize * 100}, quantity: item.amount}}),
+      success_url: process.env.SERVER_URL + "/order-completed",
+      cancel_url: process.env.SERVER_URL + "/main"
+  }) 
+
+  res.send({msg: "melo by vratit url stripu", url: session.url, next_status: undefined})
+  }))
+ 
+
+
 
   router.post('/login_request', request_data_transformer, login_request_validation, try_catch(async function (req: Request, res: Response) {   
 
