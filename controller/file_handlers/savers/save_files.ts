@@ -1,12 +1,8 @@
 import * as fs from "fs"
 import { FileArray, UploadedFile } from 'express-fileupload'
-
-const sharp = require('sharp');
-
+import modify_images from "../modify_images"
 
 export default async function save_files(path: string, files: FileArray){
-  
-    
 
     fs.mkdir(path, (err) => {   // creates folder
       if(err){
@@ -20,38 +16,17 @@ export default async function save_files(path: string, files: FileArray){
               multiple_files[index].mv(path + "/" + multiple_files[index].name, (err) => { //save files in case of multiple files
                 if(err){
                   console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message)
+                }else{
+                  modify_images(undefined, path)
                 }
               })
           }
        }else if(single_file){
-
- 
-    
-
-
-
-
-        let inputFile  = single_file.name;
-        let outputFile = single_file.name;
-        
-        sharp(inputFile).resize({ height: 780 }).toFile(outputFile)
-            .then(function(newFileInfo) {
-                // newFileInfo holds the output file properties
-                console.log("Success")
-            })
-            .catch(function(err) {
-                console.log("Error occured");
-            });
-
-
-
-
-
-
-
           single_file.mv(path + "/" + single_file.name, (err) => { //save files in case of single file
             if(err){
               console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message)
+            }else{
+              modify_images(single_file, path)
             }
           })
        }

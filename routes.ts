@@ -20,6 +20,7 @@ import select_request from "./DB/select_request.js";
 
 import refund_request_validation from "./controller/middleware/refund_request_validation.js";
 import write_json from "./controller/file_handlers/write_json.js";
+import modify_images from "./controller/file_handlers/modify_images.js";
 
 
 export const router = Router()  
@@ -97,7 +98,10 @@ export const router = Router()
 
     if(req.files){
       await save_files("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files)
+      //var a = await modify_images(req.files, "./public/images/" + JSON.parse(req.body.folder) + "/" + record_id)
     }
+
+
 
     res.send({msg: "record added", next_status: true, status: true})
 

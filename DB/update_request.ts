@@ -1,7 +1,6 @@
 import { pool } from "./pool";
 
 export default function update_request(sql: string, values: Array<Array<Array<string>>> | Array<string>){
-console.log("🚀 ~ update_request ~ sql:", sql)
 
     return new Promise<number>((resolve, reject) => {
 

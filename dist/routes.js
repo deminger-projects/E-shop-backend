@@ -74,6 +74,7 @@ exports.router.post('/add_record', request_data_transformer_js_1.default, check_
         var record_id = yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
         if (req.files) {
             yield (0, save_files_js_1.default)("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files);
+            //var a = await modify_images(req.files, "./public/images/" + JSON.parse(req.body.folder) + "/" + record_id)
         }
         res.send({ msg: "record added", next_status: true, status: true });
     });

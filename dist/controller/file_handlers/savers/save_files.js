@@ -31,9 +31,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
-const sharp = require('sharp');
+const modify_images_1 = __importDefault(require("../modify_images"));
 function save_files(path, files) {
     return __awaiter(this, void 0, void 0, function* () {
         fs.mkdir(path, (err) => {
@@ -49,23 +52,19 @@ function save_files(path, files) {
                             if (err) {
                                 console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message);
                             }
+                            else {
+                                (0, modify_images_1.default)(undefined, path);
+                            }
                         });
                     }
                 }
                 else if (single_file) {
-                    let inputFile = single_file.name;
-                    let outputFile = single_file.name;
-                    sharp(inputFile).resize({ height: 780 }).toFile(outputFile)
-                        .then(function (newFileInfo) {
-                        // newFileInfo holds the output file properties
-                        console.log("Success");
-                    })
-                        .catch(function (err) {
-                        console.log("Error occured");
-                    });
                     single_file.mv(path + "/" + single_file.name, (err) => {
                         if (err) {
                             console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message);
+                        }
+                        else {
+                            (0, modify_images_1.default)(single_file, path);
                         }
                     });
                 }
