@@ -107,7 +107,7 @@ exports.router.post('/send_aut_code', request_data_transformer_js_1.default, che
         res.send({ msg: "order found", next_status: true, status: true, code: code, record_id: req.body.user_id_auth });
     });
 }));
-exports.router.get('/test_request', (0, try_catch_js_1.default)(function (req, res) {
+exports.router.post('/main_page_request', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';",
                 "SELECT product_sizes.size, product_sizes.current_amount FROM product_sizes WHERE product_sizes.product_id = $ ;", "SELECT product_images.image_url FROM product_images WHERE product_images.product_id = $ ;"])]);
