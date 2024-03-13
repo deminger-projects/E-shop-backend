@@ -1,8 +1,6 @@
 import { pool } from "./pool";
 
 export default function insert_request(sql: string, values: Array<Array<Array<string>>> | Array<string>){
-console.log("🚀 ~ insert_request ~ values:", values)
-console.log("🚀 ~ insert_request ~ sql:", sql)
 
     return new Promise<{last_inseted_id: number}>((resolve, reject) => {
 

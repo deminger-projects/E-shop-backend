@@ -2,8 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const pool_1 = require("./pool");
 function insert_request(sql, values) {
-    console.log("🚀 ~ insert_request ~ values:", values);
-    console.log("🚀 ~ insert_request ~ sql:", sql);
     return new Promise((resolve, reject) => {
         pool_1.pool.getConnection((conn_err, conn) => {
             if (conn_err) {

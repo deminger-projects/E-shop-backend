@@ -28,6 +28,7 @@
     "mysql2": "^3.6.5",
     "nodemailer": "^6.9.7",
     "sharp": "^0.33.2",
+    "sharp-multer": "^0.3.2",
     "stripe": "^14.5.0"
   },
   "devDependencies": {

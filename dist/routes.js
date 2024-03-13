@@ -28,6 +28,7 @@ const send_emails_js_1 = __importDefault(require("./controller/other/send_emails
 const select_request_js_1 = __importDefault(require("./DB/select_request.js"));
 const refund_request_validation_js_1 = __importDefault(require("./controller/middleware/refund_request_validation.js"));
 const write_json_js_1 = __importDefault(require("./controller/file_handlers/write_json.js"));
+const modify_images_js_1 = __importDefault(require("./controller/file_handlers/modify_images.js"));
 exports.router = (0, express_1.Router)();
 exports.router.post('/stripe_create_session', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -74,7 +75,7 @@ exports.router.post('/add_record', request_data_transformer_js_1.default, check_
         var record_id = yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
         if (req.files) {
             yield (0, save_files_js_1.default)("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files);
-            //var a = await modify_images(req.files, "./public/images/" + JSON.parse(req.body.folder) + "/" + record_id)
+            (0, modify_images_js_1.default)(req.files, "./public/images/" + JSON.parse(req.body.folder) + "/" + record_id);
         }
         res.send({ msg: "record added", next_status: true, status: true });
     });

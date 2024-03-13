@@ -98,10 +98,8 @@ export const router = Router()
 
     if(req.files){
       await save_files("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files)
-      //var a = await modify_images(req.files, "./public/images/" + JSON.parse(req.body.folder) + "/" + record_id)
+      modify_images(req.files, "./public/images/" + JSON.parse(req.body.folder) + "/" + record_id)
     }
-
-
 
     res.send({msg: "record added", next_status: true, status: true})
 

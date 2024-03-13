@@ -31,15 +31,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
-const modify_images_1 = __importDefault(require("../modify_images"));
 function save_files(path, files) {
     return __awaiter(this, void 0, void 0, function* () {
-        fs.mkdir(path, (err) => {
+        fs.mkdir(path + "/temp", (err) => {
             if (err) {
                 console.log("🚀 ~ file: save_files.ts:8 ~ fs.mkdir ~ err:", err.message);
             }
@@ -48,23 +44,23 @@ function save_files(path, files) {
                 var single_file = files.single_file;
                 if (multiple_files) {
                     for (let index = 0; index < multiple_files.length; index++) {
-                        multiple_files[index].mv(path + "/" + multiple_files[index].name, (err) => {
+                        multiple_files[index].mv(path + "/temp/" + multiple_files[index].name, (err) => {
                             if (err) {
                                 console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message);
                             }
                             else {
-                                (0, modify_images_1.default)(undefined, path);
+                                //modify_images(undefined, path)
                             }
                         });
                     }
                 }
                 else if (single_file) {
-                    single_file.mv(path + "/" + single_file.name, (err) => {
+                    single_file.mv(path + "/temp/" + single_file.name, (err) => {
                         if (err) {
                             console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message);
                         }
                         else {
-                            (0, modify_images_1.default)(single_file, path);
+                            ///modify_images(single_file, path)
                         }
                     });
                 }
