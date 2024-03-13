@@ -22,13 +22,26 @@ import refund_request_validation from "./controller/middleware/refund_request_va
 import write_json from "./controller/file_handlers/write_json.js";
 import modify_images from "./controller/file_handlers/modify_images.js";
 
+const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 
 export const router = Router()  
 
 
+  router.post('/webhook', try_catch(async function (req: Request, res: Response) {  
+    
+    console.log("🚀 ~ stripe:", stripe)
+
+    // Return a 200 response to acknowledge receipt of the event
+    res.send()
+  }))
+
+
+
+
+
+
   router.post('/stripe_create_session', try_catch(async function (req: Request, res: Response) {   
 
-    const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 
     var items = JSON.parse(req.body.items)
 
