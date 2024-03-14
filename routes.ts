@@ -26,16 +26,15 @@ const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 
 export const router = Router()  
 
-
-  router.post('/webhook', try_catch(async function (req: Request, res: Response) {  
+  router.post('/webhook_payment_result', try_catch(async function (req: Request, res: Response) {  
     
+    await select_request("INSERT INFO collections (name) VALUES (?)", ["pepa"])
+
     console.log("🚀 ~ stripe:", stripe)
 
     // Return a 200 response to acknowledge receipt of the event
-    res.send()
+    res.send({msg: "webhook test", next_status: false})
   }))
-
-
 
 
 
