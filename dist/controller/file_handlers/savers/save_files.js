@@ -43,7 +43,9 @@ const fs = __importStar(require("fs"));
 function save_files(path, files) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
-        fs.mkdirSync(path);
+        if (!fs.existsSync(path)) {
+            fs.mkdirSync(path);
+        }
         var prom = [];
         var multiple_files = files.multiple_files;
         var single_file = files.single_file;

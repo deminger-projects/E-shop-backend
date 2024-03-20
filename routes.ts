@@ -113,8 +113,8 @@ export const router = Router()
     var record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
     if(req.files){
-      await save_files("./public/images/temp/" + JSON.parse(req.body.folder) + "/" + record_id + "/", req.files)
-      modify_images("./public/images/temp/" + JSON.parse(req.body.folder) + "/" + record_id + "/", record_id, JSON.parse(req.body.folder))
+      await save_files("./public/images/temp/", req.files)
+      modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
     }
 
     res.send({msg: "record added", next_status: true, status: true})

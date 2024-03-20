@@ -3,8 +3,10 @@ import { FileArray, UploadedFile } from 'express-fileupload'
 
 export default async function save_files(path: string, files: FileArray){
 
-    fs.mkdirSync(path)
-
+    if(!fs.existsSync(path)){
+      fs.mkdirSync(path)
+    }
+    
     var prom = []
 
       var multiple_files = files.multiple_files as UploadedFile[]
