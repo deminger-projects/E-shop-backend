@@ -140,6 +140,7 @@ exports.router.post('/edit_record', request_data_transformer_js_1.default, check
         }
         if (req.files) {
             yield (0, update_files_js_1.default)(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id), req.files);
+            (0, modify_images_js_1.default)("./public/images/temp/", JSON.parse(req.body.record_id), JSON.parse(req.body.folder));
         }
         else if (req.body.files_names_to_keep) {
             yield (0, update_files_js_1.default)(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id));
