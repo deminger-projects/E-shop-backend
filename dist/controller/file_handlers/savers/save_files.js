@@ -31,41 +31,44 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 function save_files(path, files) {
+    var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
-        fs.mkdir(path + "/temp", (err) => {
-            if (err) {
-                console.log("🚀 ~ file: save_files.ts:8 ~ fs.mkdir ~ err:", err.message);
-            }
-            else {
-                var multiple_files = files.multiple_files;
-                var single_file = files.single_file;
-                if (multiple_files) {
-                    for (let index = 0; index < multiple_files.length; index++) {
-                        multiple_files[index].mv(path + "/temp/" + multiple_files[index].name, (err) => {
-                            if (err) {
-                                console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message);
-                            }
-                            else {
-                                //modify_images(undefined, path)
-                            }
-                        });
-                    }
-                }
-                else if (single_file) {
-                    single_file.mv(path + "/temp/" + single_file.name, (err) => {
-                        if (err) {
-                            console.log("🚀 ~ file: save_files.ts:13 ~ file.mv ~ err:", err.message);
-                        }
-                        else {
-                            ///modify_images(single_file, path)
-                        }
-                    });
+        fs.mkdirSync(path);
+        var prom = [];
+        var multiple_files = files.multiple_files;
+        var single_file = files.single_file;
+        if (multiple_files) {
+            try {
+                for (var _d = true, multiple_files_1 = __asyncValues(multiple_files), multiple_files_1_1; multiple_files_1_1 = yield multiple_files_1.next(), _a = multiple_files_1_1.done, !_a; _d = true) {
+                    _c = multiple_files_1_1.value;
+                    _d = false;
+                    const file = _c;
+                    prom.push(file.mv(path + file.name));
                 }
             }
-        });
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (!_d && !_a && (_b = multiple_files_1.return)) yield _b.call(multiple_files_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            yield Promise.all(prom);
+        }
+        else if (single_file) {
+            prom.push(single_file.mv(path + single_file.name));
+            yield Promise.all(prom);
+        }
     });
 }
 exports.default = save_files;

@@ -21,6 +21,8 @@ import select_request from "./DB/select_request.js";
 import refund_request_validation from "./controller/middleware/refund_request_validation.js";
 import write_json from "./controller/file_handlers/write_json.js";
 import modify_images from "./controller/file_handlers/modify_images.js";
+import validate_user_data from "./controller/middleware/validate_user_data.js";
+import validate_cart_data from "./controller/middleware/validate_cart_data.js";
 
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 
@@ -37,7 +39,7 @@ export const router = Router()
   }))
 
 
-
+ 
 
   router.post('/stripe_create_session', try_catch(async function (req: Request, res: Response) {   
 
@@ -62,7 +64,7 @@ export const router = Router()
 
     await update_records(["users"], [["login_status"]], [[["Active"]]], req.body.login_request_validation.user_id)
 
-    const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", req.body.login_request_validation.user_id)
+    const user_data = await select_request("SELECT username, email, password, login_status FROM users WHERE id = ?", req.body.login_request_validation.user_id)
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.login_request_validation.user_id)
 
@@ -70,13 +72,15 @@ export const router = Router()
 
   }))
  
-  router.post('/logoff_request', request_data_transformer, try_catch(async function (req: Request, res: Response) {   
+  router.post('/logoff_request', validate_user_data, request_data_transformer, try_catch(async function (req: Request, res: Response) {   
 
-    await update_records(["users"], [["login_status"]], [[["Inactive"]]], req.body.record_id)
+    const record_id = req.body.id
 
-    const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", req.body.record_id)
+    await update_records(["users"], [["login_status"]], [[["Inactive"]]], record_id)
 
-    const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.record_id)
+    const user_data = await select_request("SELECT id, username, email, password, login_status FROM users WHERE id = ?", record_id)
+
+    const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", record_id)
 
     res.send({msg: "user loged off", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data })
 
@@ -102,15 +106,15 @@ export const router = Router()
 
 
 
-  router.post('/add_record', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) {   
-
+  router.post('/add_record', validate_cart_data, request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) { 
+    
     const transformed_data = req.body.transformed_data
 
     var record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
     if(req.files){
-      await save_files("./public/images/" + JSON.parse(req.body.folder) + "/" + record_id, req.files)
-      modify_images(req.files, "./public/images/" + JSON.parse(req.body.folder) + "/" + record_id)
+      await save_files("./public/images/temp/" + JSON.parse(req.body.folder) + "/" + record_id + "/", req.files)
+      modify_images("./public/images/temp/" + JSON.parse(req.body.folder) + "/" + record_id + "/", record_id, JSON.parse(req.body.folder))
     }
 
     res.send({msg: "record added", next_status: true, status: true})
@@ -191,6 +195,10 @@ export const router = Router()
 
 
 
+  //page data getters
+
+
+
 
   router.post('/main_page_request', try_catch(async function (req: Request, res: Response) {   
 
@@ -214,6 +222,127 @@ export const router = Router()
   }))
 
 
+  router.post('/get_placed_orders', try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";", 
+    
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    console.log("🚀 ~ data:", data)
+
+    res.send(JSON.parse(data))
+
+  }))
+  
+
+  router.post('/get_collections', try_catch(async function (req: Request, res: Response) {   
+
+    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
+    "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+    console.log("🚀 ~ data:", data)
+    
+    res.send(JSON.parse(data))
+  
+
+  }))
+
+
+  router.post('/get_refund_reasons', try_catch(async function (req: Request, res: Response) {   
+
+    var data: any = await Promise.all([write_json(["SELECT id, reason FROM refund_reasons"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  router.post('/get_user_refunds', validate_user_data, try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
+    
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_user_acccount_data', validate_user_data, try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT users.id, users.username, users.email, users.password FROM users WHERE users.id = " + id + " ;", 
+    
+    "SELECT user_data.id, user_data.user_id, user_data.name, user_data.surname, user_data.phone, user_data.adress, user_data.city, user_data.postcode, user_data.status, users.email FROM user_data JOIN users ON users.id = user_data.user_id WHERE user_id = " + id + " AND status = 'Active';"])])
+
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_user_avaible_returns', validate_user_data, try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
+    
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_user_place_returns', validate_user_data, try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + " && (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status != 'Cancled') < 1;",
+    
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_user_placed_orders', validate_user_data, try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";", 
+    
+    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
+    console.log("🚀 ~ data:", data)
+
+    res.send(JSON.parse(data))
+
+  }))
+
+
+
+
+
+
+
+
+
+
+  
   router.post('/get_admin_collections', try_catch(async function (req: Request, res: Response) {   
 
     var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
@@ -244,77 +373,6 @@ export const router = Router()
 
   }))
 
-  router.post('/get_placed_orders', try_catch(async function (req: Request, res: Response) {   
-
-    const id = req.body.id
-
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";", 
-    
-    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
-    console.log("🚀 ~ data:", data)
-
-    res.send(JSON.parse(data))
-
-  }))
-  
-
-  router.post('/get_collections', try_catch(async function (req: Request, res: Response) {   
-
-    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
-    "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
-    console.log("🚀 ~ data:", data)
-    
-    res.send(JSON.parse(data))
-
-  }))
-
-  router.post('/get_user_refunds', try_catch(async function (req: Request, res: Response) {   
-
-    const id = req.body.id
-
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
-    
-    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
-    
-    res.send(JSON.parse(data))
-
-  }))
-
-  router.post('/get_user_acccount_data', try_catch(async function (req: Request, res: Response) {   
-
-    const id = req.body.id
-
-    var data: any = await Promise.all([write_json(["SELECT users.id, users.username, users.email, users.password FROM users WHERE users.id = " + id + " ;", 
-    
-    "SELECT user_data.id, user_data.user_id, user_data.name, user_data.surname, user_data.phone, user_data.adress, user_data.city, user_data.postcode, user_data.status, users.email FROM user_data JOIN users ON users.id = user_data.user_id WHERE user_id = " + id + " AND status = 'Active';"])])
-
-    res.send(JSON.parse(data))
-
-  }))
-
-  router.post('/get_user_avaible_returns', try_catch(async function (req: Request, res: Response) {   
-
-    const id = req.body.id
-
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
-    
-    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
-    
-    res.send(JSON.parse(data))
-
-  }))
-
-  router.post('/get_user_place_returns', try_catch(async function (req: Request, res: Response) {   
-
-    const id = req.body.id
-
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + " && (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status != 'Cancled') < 1;",
-    
-    "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
-    
-    res.send(JSON.parse(data))
-
-  }))
 
   router.post('/get_admin_refunds', try_catch(async function (req: Request, res: Response) {   
 
@@ -328,13 +386,7 @@ export const router = Router()
 
   }))
 
-  router.post('/get_refund_reasons', try_catch(async function (req: Request, res: Response) {   
-
-    var data: any = await Promise.all([write_json(["SELECT id, reason FROM refund_reasons"])])
-    
-    res.send(JSON.parse(data))
-
-  }))
+ 
 
 
   router.use(error_handler)
