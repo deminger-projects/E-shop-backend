@@ -20,7 +20,6 @@ app.use(express.static('public')) //udeluje pristup k server public dir
 
 app.use('/', router)  // pristupuje k app.post/get requestum
 
-
 const port = process.env.PORT || 4000;
 
 app.listen(port, function () {

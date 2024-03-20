@@ -31,24 +31,62 @@ const write_json_js_1 = __importDefault(require("./controller/file_handlers/writ
 const modify_images_js_1 = __importDefault(require("./controller/file_handlers/modify_images.js"));
 const validate_user_data_js_1 = __importDefault(require("./controller/middleware/validate_user_data.js"));
 const validate_cart_data_js_1 = __importDefault(require("./controller/middleware/validate_cart_data.js"));
-const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+//const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
+const stripe = require("stripe")('sk_test_51OHsB9C2agLPKl6uq4bSJh45m0Jl4tVzcdIFxiednewjV17crrnvGYoslGSfS4dBwH1OjNJpc3I3TS6ZCboS5tiN00xHXbm7Oy');
+var endpointSecret = undefined;
+//const endpointSecret = "whsec_b6e67eada329714ee59ea0f0cea0617712dc177e12091c01d5f83e5196c52d49"; // local test
+const express = require('express');
 exports.router = (0, express_1.Router)();
-exports.router.post('/webhook_payment_result', (0, try_catch_js_1.default)(function (req, res) {
+//stripe webhook
+exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield (0, select_request_js_1.default)("INSERT INFO collections (name) VALUES (?)", ["pepa"]);
-        console.log("🚀 ~ stripe:", stripe);
+        const sig = req.headers['stripe-signature'];
+        let data;
+        let event_type;
+        if (endpointSecret) {
+            let event;
+            try {
+                event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+                console.log("webhook verified");
+            }
+            catch (err) {
+                console.log("🚀 ~ router.post ~ err:", err.message);
+                console.log("webhook not verified");
+                res.status(400).send(`Webhook Error: ${err.message}`);
+                return;
+            }
+            data = event.data.object;
+            event_type = event.type;
+        }
+        else {
+            data = req.body.data.object;
+            event_type = req.body.type;
+        }
+        // Handle the event
+        if (event_type === "checkout.session.completed") {
+            var cunstomer_data = yield stripe.customers.retrieve(data.customer);
+            var transformed_data = JSON.parse(cunstomer_data.metadata.data);
+            yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
+        }
         // Return a 200 response to acknowledge receipt of the event
-        res.send({ msg: "webhook test", next_status: false });
+        res.send().end;
     });
 }));
-exports.router.post('/stripe_create_session', (0, try_catch_js_1.default)(function (req, res) {
+//stripe webhook
+exports.router.post('/stripe_create_session', request_data_transformer_js_1.default, validate_cart_data_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var items = JSON.parse(req.body.items);
+        const customer = yield stripe.customers.create({
+            metadata: {
+                data: JSON.stringify(req.body.transformed_data)
+            }
+        });
         const session = yield stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: "payment",
+            customer: customer.id,
             line_items: items.products.map((item) => { return { price_data: { currency: "usd", product_data: { name: item.name }, unit_amount: item.prize * 100 }, quantity: item.amount }; }),
-            success_url: process.env.SERVER_URL + "/order-completed",
+            success_url: process.env.SERVER_URL + "/main",
             cancel_url: process.env.SERVER_URL + "/main"
         });
         res.send({ msg: "melo by vratit url stripu", url: session.url, next_status: undefined });
