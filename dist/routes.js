@@ -66,7 +66,9 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
         if (event_type === "checkout.session.completed") {
             var cunstomer_data = yield stripe.customers.retrieve(data.customer);
             var transformed_data = JSON.parse(cunstomer_data.metadata.data);
+            console.log("🚀 ~ transformed_data:", transformed_data);
             yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
+            (0, send_emails_js_1.default)(transformed_data.email, "pes");
         }
         // Return a 200 response to acknowledge receipt of the event
         res.send().end;
@@ -193,7 +195,6 @@ exports.router.post('/get_placed_orders', (0, try_catch_js_1.default)(function (
         const id = req.body.id;
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";",
                 "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
-        console.log("🚀 ~ data:", data);
         res.send(JSON.parse(data));
     });
 }));
@@ -201,7 +202,6 @@ exports.router.post('/get_collections', (0, try_catch_js_1.default)(function (re
     return __awaiter(this, void 0, void 0, function* () {
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
                 "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])]);
-        console.log("🚀 ~ data:", data);
         res.send(JSON.parse(data));
     });
 }));
@@ -248,7 +248,6 @@ exports.router.post('/get_user_placed_orders', validate_user_data_js_1.default, 
         const id = req.body.id;
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";",
                 "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
-        console.log("🚀 ~ data:", data);
         res.send(JSON.parse(data));
     });
 }));

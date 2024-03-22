@@ -25,4 +25,4 @@ export default function modify_images(path: string, record_id: number, folder: s
             }
         }) 
     }
-}
+} 

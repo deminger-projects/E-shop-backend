@@ -21,7 +21,6 @@ export default async function insert_records(tables: Array<string>, columns: Arr
         var sql = "INSERT INTO " + tables[table_index] + " (" + columns_string + ") VALUES ?"
 
         sql_inserts.push(sql)
-        
     }
 
     var record_id!: number
