@@ -162,6 +162,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   }))
 
 
+ 
 
 
 
@@ -169,8 +170,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
 
 
-
-  router.post('/add_record', validate_cart_data, request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) { 
+  router.post('/add_record', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) { 
     
     const transformed_data = req.body.transformed_data
 
@@ -186,6 +186,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   }))  
 
   router.post('/edit_record', request_data_transformer, check_for_duplicit_record, try_catch(async function (req: Request, res: Response) { 
+
 
     const transformed_data = req.body.transformed_data
 
@@ -263,13 +264,20 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   //page data getters
 
 
+  router.post('/get_user_id', validate_user_data, try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    res.send(JSON.stringify(id))
+
+  }))
+
+ 
 
 
   router.post('/main_page_request', try_catch(async function (req: Request, res: Response) {   
 
-    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';", 
-    
-    "SELECT product_sizes.size, product_sizes.current_amount FROM product_sizes WHERE product_sizes.product_id = $ ;", "SELECT product_images.image_url FROM product_images WHERE product_images.product_id = $ ;"])])
+    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';"])])
 
     res.send(JSON.parse(data))
 

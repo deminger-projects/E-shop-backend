@@ -2,7 +2,11 @@ import { Request, Response, NextFunction  } from "express";
 import select_request from "../../DB/select_request";
 
 const check_for_duplicit_record = async(req: Request, res: Response, next: NextFunction) => {
-   
+
+    // if(req.body.psw_change){
+    //     return next()
+    // }
+
     const data = req.body.transformed_data
 
     var where_conditions = ""
