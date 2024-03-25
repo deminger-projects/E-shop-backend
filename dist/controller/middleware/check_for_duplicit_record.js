@@ -14,9 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const select_request_1 = __importDefault(require("../../DB/select_request"));
 const check_for_duplicit_record = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    // if(req.body.psw_change){
-    //     return next()
-    // }
+    console.log(req.body);
+    if (req.body.psw_change) {
+        return next();
+    }
     const data = req.body.transformed_data;
     var where_conditions = "";
     for (let index = 0; index < data.wheres.columns.length; index++) {
@@ -27,20 +28,25 @@ const check_for_duplicit_record = (req, res, next) => __awaiter(void 0, void 0, 
             where_conditions += data.wheres.columns[index] + " = ? AND ";
         }
     }
-    if (data.wheres.columns.length <= 0) {
-        if (req.body.record_id) {
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + req.body.record_id + " AND status != 'Deleted';";
-        }
-        else {
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE status != 'Deleted';";
-        }
+    if (req.body.auth_code) {
+        var sql = 'SELECT * FROM ' + data.tables[0] + " WHERE " + where_conditions;
     }
     else {
-        if (req.body.record_id) {
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND id != " + req.body.record_id + " AND status != 'Deleted';";
+        if (data.wheres.columns.length <= 0) {
+            if (req.body.record_id) {
+                var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + req.body.record_id + " AND status != 'Deleted';";
+            }
+            else {
+                var sql = "SELECT * FROM " + data.tables[0] + " WHERE status != 'Deleted';";
+            }
         }
         else {
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND status != 'Deleted';";
+            if (req.body.record_id) {
+                var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND id != " + req.body.record_id + " AND status != 'Deleted';";
+            }
+            else {
+                var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND status != 'Deleted';";
+            }
         }
     }
     const result = yield (0, select_request_1.default)(sql, data.wheres.values);

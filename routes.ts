@@ -114,7 +114,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
 
 
-
+ 
 
 
 
@@ -129,12 +129,12 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.login_request_validation.user_id)
 
     res.send({msg: "user loged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
-
+ 
   }))
  
   router.post('/logoff_request', validate_user_data, request_data_transformer, try_catch(async function (req: Request, res: Response) {   
 
-    const record_id = req.body.id
+    const record_id = req.body.user_data.id
 
     await update_records(["users"], [["login_status"]], [[["Inactive"]]], record_id)
 
@@ -204,7 +204,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     }
 
     if(req.body.psw_change){
-      res.send({msg: "password changed", next_status: true})
+      return res.send({msg: "password changed", next_status: true})
     }
 
     res.send({msg: "record edited", next_status: true})
@@ -251,28 +251,28 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     res.send({msg: "order found", next_status: true, status: true, code: code, record_id: req.body.user_id_auth})
 
-  }))
+  })) 
 
 
 
 
 
-
+  
 
 
 
   //page data getters
 
 
-  router.post('/get_user_id', validate_user_data, try_catch(async function (req: Request, res: Response) {   
+  router.post('/get_user_data', validate_user_data, try_catch(async function (req: Request, res: Response) {   
 
-    const id = req.body.id
+    const user_data = req.body.user_data
 
-    res.send(JSON.stringify(id))
+    res.send(JSON.stringify(user_data))
 
   }))
-
  
+  
 
 
   router.post('/main_page_request', try_catch(async function (req: Request, res: Response) {   
@@ -297,7 +297,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/get_placed_orders', try_catch(async function (req: Request, res: Response) {   
 
-    const id = req.body.id
+    const id = req.body.user_data.id
 
     var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";", 
     
@@ -345,7 +345,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/get_user_refunds', validate_user_data, try_catch(async function (req: Request, res: Response) {   
 
-    const id = req.body.id
+    const id = req.body.user_data.id
 
     var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
     
@@ -357,7 +357,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/get_user_acccount_data', validate_user_data, try_catch(async function (req: Request, res: Response) {   
 
-    const id = req.body.id
+    const id = req.body.user_data.id
 
     var data: any = await Promise.all([write_json(["SELECT users.id, users.username, users.email, users.password FROM users WHERE users.id = " + id + " ;", 
     
@@ -369,21 +369,21 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/get_user_avaible_returns', validate_user_data, try_catch(async function (req: Request, res: Response) {   
 
-    const id = req.body.id
+    const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + ";",
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && orders.add_date + INTERVAL -30 DAY <= NOW();;",
     
     "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
     
-    res.send(JSON.parse(data))
+    res.send(JSON.parse(data)) 
 
   }))
 
   router.post('/get_user_place_returns', validate_user_data, try_catch(async function (req: Request, res: Response) {   
 
-    const id = req.body.id
+    const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders WHERE orders.add_date + INTERVAL -30 DAY <= NOW() && user_id = " + id + " && (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status != 'Cancled') < 1;",
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders ON orders.id = refunds.order_id WHERE orders.user_id = " + id + ";",
     
     "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
     
@@ -393,7 +393,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/get_user_placed_orders', validate_user_data, try_catch(async function (req: Request, res: Response) {   
 
-    const id = req.body.id
+    const id = req.body.user_data.id
 
     var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";", 
     
@@ -445,8 +445,6 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
 
   router.post('/get_admin_refunds', try_catch(async function (req: Request, res: Response) {   
-
-    const id = req.body.id
 
     var data: any = await Promise.all([write_json(["SELECT refunds.id, orders.id as order_id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders on refunds.order_id = orders.id;",
     

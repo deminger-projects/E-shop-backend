@@ -3,9 +3,11 @@ import select_request from "../../DB/select_request";
 
 const check_for_duplicit_record = async(req: Request, res: Response, next: NextFunction) => {
 
-    // if(req.body.psw_change){
-    //     return next()
-    // }
+    console.log(req.body)
+
+    if(req.body.psw_change){
+        return next()
+    }
 
     const data = req.body.transformed_data
 
@@ -19,19 +21,24 @@ const check_for_duplicit_record = async(req: Request, res: Response, next: NextF
         }
     }
 
-    if(data.wheres.columns.length <= 0){
-        if(req.body.record_id){
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + req.body.record_id + " AND status != 'Deleted';"
-        }else{
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE status != 'Deleted';"
-        }
+    if(req.body.auth_code){
+        var sql = 'SELECT * FROM ' + data.tables[0] + " WHERE " + where_conditions
     }else{
-        if(req.body.record_id){
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND id != " + req.body.record_id + " AND status != 'Deleted';"
+        if(data.wheres.columns.length <= 0){
+            if(req.body.record_id){
+                var sql = "SELECT * FROM " + data.tables[0] + " WHERE id != " + req.body.record_id + " AND status != 'Deleted';"
+            }else{
+                var sql = "SELECT * FROM " + data.tables[0] + " WHERE status != 'Deleted';"
+            }
         }else{
-            var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND status != 'Deleted';"
-        }
-    }    
+            if(req.body.record_id){
+                var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND id != " + req.body.record_id + " AND status != 'Deleted';"
+            }else{
+                var sql = "SELECT * FROM " + data.tables[0] + " WHERE " + where_conditions + " AND status != 'Deleted';"
+            }
+        }    
+    }
+    
 
     const result = await select_request(sql, data.wheres.values)
 
