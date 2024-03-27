@@ -87,7 +87,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
  
 
-  router.post('/stripe_create_session', request_data_transformer, validate_cart_data, try_catch(async function (req: Request, res: Response) { 
+  router.post('/stripe_create_session', request_data_transformer, try_catch(async function (req: Request, res: Response) { 
     
     var items = JSON.parse(req.body.items)
 
@@ -318,6 +318,27 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   }))
 
+  router.post('/get_collections_showcase', try_catch(async function (req: Request, res: Response) {   
+
+    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active' AND (SELECT COUNT(products.id) FROM products WHERE products.collection_id = collections.id);",
+    "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+    
+    res.send(JSON.parse(data))
+  
+
+  }))
+
+  
+  router.post('/get_collection_product_showcase', try_catch(async function (req: Request, res: Response) {   
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' AND products.collection_id = " + id + " AND products.status = 'Active';"])])
+    
+    res.send(JSON.parse(data))
+  
+
+  }))
 
   router.post('/get_refund_reasons', try_catch(async function (req: Request, res: Response) {   
 
@@ -453,6 +474,19 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     res.send(JSON.parse(data))
 
   }))
+
+  router.post('/check_for_admin', try_catch(async function (req: Request, res: Response) {   
+
+    var id = Number((await select_request("SELECT id FROM users WHERE email = ? AND password = ? ;", [JSON.parse(req.body.email), JSON.parse(req.body.password)]))[0].id)
+
+    if(id === Number(process.env.ADMIN_ID)){
+      res.send({msg: "user is admin", next_status: true})
+    }else{
+      res.send({msg: "user is not a admin", next_status: false})
+    }
+
+  }))
+
 
  
 

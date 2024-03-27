@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const select_request_1 = __importDefault(require("../../DB/select_request"));
 const check_for_duplicit_record = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
     if (req.body.psw_change) {
         return next();
     }

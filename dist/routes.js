@@ -30,7 +30,6 @@ const refund_request_validation_js_1 = __importDefault(require("./controller/mid
 const write_json_js_1 = __importDefault(require("./controller/file_handlers/write_json.js"));
 const modify_images_js_1 = __importDefault(require("./controller/file_handlers/modify_images.js"));
 const validate_user_data_js_1 = __importDefault(require("./controller/middleware/validate_user_data.js"));
-const validate_cart_data_js_1 = __importDefault(require("./controller/middleware/validate_cart_data.js"));
 //const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 const stripe = require("stripe")('sk_test_51OHsB9C2agLPKl6uq4bSJh45m0Jl4tVzcdIFxiednewjV17crrnvGYoslGSfS4dBwH1OjNJpc3I3TS6ZCboS5tiN00xHXbm7Oy');
 var endpointSecret = undefined;
@@ -75,7 +74,7 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
     });
 }));
 //stripe webhook
-exports.router.post('/stripe_create_session', request_data_transformer_js_1.default, validate_cart_data_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
+exports.router.post('/stripe_create_session', request_data_transformer_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var items = JSON.parse(req.body.items);
         const customer = yield stripe.customers.create({
@@ -210,6 +209,20 @@ exports.router.post('/get_collections', (0, try_catch_js_1.default)(function (re
         res.send(JSON.parse(data));
     });
 }));
+exports.router.post('/get_collections_showcase', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active' AND (SELECT COUNT(products.id) FROM products WHERE products.collection_id = collections.id);",
+                "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])]);
+        res.send(JSON.parse(data));
+    });
+}));
+exports.router.post('/get_collection_product_showcase', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' AND products.collection_id = " + id + " AND products.status = 'Active';"])]);
+        res.send(JSON.parse(data));
+    });
+}));
 exports.router.post('/get_refund_reasons', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT id, reason FROM refund_reasons"])]);
@@ -282,6 +295,17 @@ exports.router.post('/get_admin_refunds', (0, try_catch_js_1.default)(function (
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT refunds.id, orders.id as order_id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders on refunds.order_id = orders.id;",
                 "SELECT refund_products.product_id, refund_products.amount, refund_products.size, products.name, refund_reasons.reason, products.price FROM refund_products JOIN products ON products.id = refund_products.product_id JOIN refund_reasons ON refund_reasons.id = refund_products.reason_id JOIN refunds ON refunds.id = refund_products.refund_id WHERE refunds.id = $ ;"])]);
         res.send(JSON.parse(data));
+    });
+}));
+exports.router.post('/check_for_admin', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var id = Number((yield (0, select_request_js_1.default)("SELECT id FROM users WHERE email = ? AND password = ? ;", [JSON.parse(req.body.email), JSON.parse(req.body.password)]))[0].id);
+        if (id === Number(process.env.ADMIN_ID)) {
+            res.send({ msg: "user is admin", next_status: true });
+        }
+        else {
+            res.send({ msg: "user is not a admin", next_status: false });
+        }
     });
 }));
 exports.router.use(error_handler_js_1.default);

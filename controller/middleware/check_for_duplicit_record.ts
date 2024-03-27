@@ -3,8 +3,6 @@ import select_request from "../../DB/select_request";
 
 const check_for_duplicit_record = async(req: Request, res: Response, next: NextFunction) => {
 
-    console.log(req.body)
-
     if(req.body.psw_change){
         return next()
     }
