@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction  } from "express";
 
+const bcrypt = require('bcrypt');
+
 const request_data_transformer = async(req: Request, res: Response, next: NextFunction) => {
 
     const records = JSON.parse(req.body.tables)
@@ -17,9 +19,15 @@ const request_data_transformer = async(req: Request, res: Response, next: NextFu
     var where_cols: Array<string> = []
     var where_vals: Array<string> = []
     var email = ""
+    var password = ""
 
     for (let table_colunm_index = 0; table_colunm_index < columns.length; table_colunm_index++) {       //create where conditions
         for (let column_index = 0; column_index < columns[table_colunm_index].length; column_index++) {
+
+            if(columns[table_colunm_index][column_index] === "password" || columns[table_colunm_index][column_index] === "password$"){
+                password = values[table_colunm_index][column_index]
+                values[table_colunm_index][column_index] = await bcrypt.hash(password, 10)
+            }
 
             if(columns[table_colunm_index][column_index] === "email" || columns[table_colunm_index][column_index] === "email$"){
                 email = values[table_colunm_index][column_index]
@@ -73,7 +81,7 @@ const request_data_transformer = async(req: Request, res: Response, next: NextFu
         }
     }
     
-    req.body.transformed_data = {tables: tables, columns: columns, values: new_values, wheres: {columns: where_cols, values: where_vals}, email: email}
+    req.body.transformed_data = {tables: tables, columns: columns, values: new_values, wheres: {columns: where_cols, values: where_vals}, email: email, password: password}
     
     next()
 }

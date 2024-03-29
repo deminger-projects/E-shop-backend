@@ -30,6 +30,7 @@ const refund_request_validation_js_1 = __importDefault(require("./controller/mid
 const write_json_js_1 = __importDefault(require("./controller/file_handlers/write_json.js"));
 const modify_images_js_1 = __importDefault(require("./controller/file_handlers/modify_images.js"));
 const validate_user_data_js_1 = __importDefault(require("./controller/middleware/validate_user_data.js"));
+const send_receipt_js_1 = __importDefault(require("./controller/emails/send_receipt.js"));
 //const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 const stripe = require("stripe")('sk_test_51OHsB9C2agLPKl6uq4bSJh45m0Jl4tVzcdIFxiednewjV17crrnvGYoslGSfS4dBwH1OjNJpc3I3TS6ZCboS5tiN00xHXbm7Oy');
 var endpointSecret = undefined;
@@ -65,9 +66,9 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
         if (event_type === "checkout.session.completed") {
             var cunstomer_data = yield stripe.customers.retrieve(data.customer);
             var transformed_data = JSON.parse(cunstomer_data.metadata.data);
-            console.log("🚀 ~ transformed_data:", transformed_data);
-            yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
-            (0, send_emails_js_1.default)(transformed_data.email, "pes");
+            var cart_data = JSON.parse(cunstomer_data.metadata.cart);
+            var order_id = yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
+            (0, send_receipt_js_1.default)(transformed_data.email, JSON.parse(cart_data), order_id);
         }
         // Return a 200 response to acknowledge receipt of the event
         res.send().end;
@@ -79,7 +80,8 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
         var items = JSON.parse(req.body.items);
         const customer = yield stripe.customers.create({
             metadata: {
-                data: JSON.stringify(req.body.transformed_data)
+                data: JSON.stringify(req.body.transformed_data),
+                cart: JSON.stringify(req.body.cart)
             }
         });
         const session = yield stripe.checkout.sessions.create({
@@ -91,6 +93,25 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
             cancel_url: process.env.SERVER_URL + "/main"
         });
         res.send({ msg: "melo by vratit url stripu", url: session.url, next_status: undefined });
+    });
+}));
+exports.router.post('/validate_cart_items', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var products = JSON.parse(req.body.tables);
+        var valid = true;
+        for (let item of products) {
+            var a = yield (0, select_request_js_1.default)("SELECT * FROM products WHERE id = ? AND name = ? AND price = ? AND description = ? AND discount = ? AND status = 'Active'", [item.id, item.name, item.price, item.description, item.discount]);
+            if (a.length < 1) {
+                valid = false;
+                break;
+            }
+        }
+        if (valid) {
+            res.send({ msg: "all items valid", next_status: true });
+        }
+        else {
+            res.send({ msg: "items not valid, posible manipulation with cookies", next_status: false });
+        }
     });
 }));
 exports.router.post('/login_request', request_data_transformer_js_1.default, login_request_validation_js_1.default, (0, try_catch_js_1.default)(function (req, res) {

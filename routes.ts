@@ -22,8 +22,7 @@ import refund_request_validation from "./controller/middleware/refund_request_va
 import write_json from "./controller/file_handlers/write_json.js";
 import modify_images from "./controller/file_handlers/modify_images.js";
 import validate_user_data from "./controller/middleware/validate_user_data.js";
-import validate_cart_data from "./controller/middleware/validate_cart_data.js";
-import transform_records from "./controller/other/transform_records.js";
+import send_receipt from "./controller/emails/send_receipt.js";
 
 //const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 const stripe = require("stripe")('sk_test_51OHsB9C2agLPKl6uq4bSJh45m0Jl4tVzcdIFxiednewjV17crrnvGYoslGSfS4dBwH1OjNJpc3I3TS6ZCboS5tiN00xHXbm7Oy')
@@ -70,11 +69,12 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     var cunstomer_data = await stripe.customers.retrieve(data.customer)
 
     var transformed_data = JSON.parse(cunstomer_data.metadata.data)
-    console.log("🚀 ~ transformed_data:", transformed_data)
 
-    await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
+    var cart_data = JSON.parse(cunstomer_data.metadata.cart)
 
-    send_emails(transformed_data.email, "pes")
+    var order_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
+
+    send_receipt(transformed_data.email, JSON.parse(cart_data), order_id)
 
   }
 
@@ -93,7 +93,8 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const customer = await stripe.customers.create({
       metadata: {
-        data: JSON.stringify(req.body.transformed_data)
+        data: JSON.stringify(req.body.transformed_data),
+        cart: JSON.stringify(req.body.cart)
       }
     })
 
@@ -111,6 +112,29 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
  
 
 
+
+  router.post('/validate_cart_items', try_catch(async function (req: Request, res: Response) {   
+
+    var products = JSON.parse(req.body.tables)
+
+    var valid = true
+
+    for(let item of products){
+      var a = await select_request("SELECT * FROM products WHERE id = ? AND name = ? AND price = ? AND description = ? AND discount = ? AND status = 'Active'", [item.id, item.name, item.price, item.description, item.discount])
+      
+      if(a.length < 1){
+        valid = false 
+        break
+      }
+    }
+
+    if(valid){
+      res.send({msg: "all items valid", next_status: true})
+    }else{
+      res.send({msg: "items not valid, posible manipulation with cookies", next_status: false})
+    }
+ 
+  }))
 
 
 

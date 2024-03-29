@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const bcrypt = require('bcrypt');
 const request_data_transformer = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const records = JSON.parse(req.body.tables);
     var tables = Object.keys(records);
@@ -22,8 +23,13 @@ const request_data_transformer = (req, res, next) => __awaiter(void 0, void 0, v
     var where_cols = [];
     var where_vals = [];
     var email = "";
+    var password = "";
     for (let table_colunm_index = 0; table_colunm_index < columns.length; table_colunm_index++) { //create where conditions
         for (let column_index = 0; column_index < columns[table_colunm_index].length; column_index++) {
+            if (columns[table_colunm_index][column_index] === "password" || columns[table_colunm_index][column_index] === "password$") {
+                password = values[table_colunm_index][column_index];
+                values[table_colunm_index][column_index] = yield bcrypt.hash(password, 10);
+            }
             if (columns[table_colunm_index][column_index] === "email" || columns[table_colunm_index][column_index] === "email$") {
                 email = values[table_colunm_index][column_index];
             }
@@ -72,7 +78,7 @@ const request_data_transformer = (req, res, next) => __awaiter(void 0, void 0, v
             new_values.push(new_values2);
         }
     }
-    req.body.transformed_data = { tables: tables, columns: columns, values: new_values, wheres: { columns: where_cols, values: where_vals }, email: email };
+    req.body.transformed_data = { tables: tables, columns: columns, values: new_values, wheres: { columns: where_cols, values: where_vals }, email: email, password: password };
     next();
 });
 exports.default = request_data_transformer;
