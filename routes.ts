@@ -103,7 +103,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
       mode: "payment",
       customer: customer.id,
       line_items: items.products.map((item: any) => {return {price_data: {currency: "usd", product_data: {name: item.name}, unit_amount: item.prize * 100}, quantity: item.amount}}),
-      success_url: process.env.SERVER_URL + "/main",
+      success_url: process.env.SERVER_URL + "/order-completed",
       cancel_url: process.env.SERVER_URL + "/main"
   }) 
 
@@ -261,7 +261,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var refund_products = await select_request("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id WHERE order_id = ?;", req.body.order_data[0].id)
     
-    res.send({msg: "order found", next_status: true, status: true, code: code, data: {refunds: [req.body.order_data[0]], order_products: refund_products}})
+    res.send({msg: "order found", next_status: true, status: true, code: code, data: {orders: [req.body.order_data[0]], order_products: refund_products}})
 
   }))
 
@@ -502,7 +502,6 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   router.post('/check_for_admin', try_catch(async function (req: Request, res: Response) {   
 
     var id = Number((await select_request("SELECT id FROM users WHERE email = ? AND password = ? ;", [JSON.parse(req.body.email), JSON.parse(req.body.password)]))[0].id)
-    console.log("🚀 ~ id:", id)
 
     if(id === Number(process.env.ADMIN_ID)){
       res.send({msg: "user is admin", next_status: true})

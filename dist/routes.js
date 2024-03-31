@@ -89,7 +89,7 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
             mode: "payment",
             customer: customer.id,
             line_items: items.products.map((item) => { return { price_data: { currency: "usd", product_data: { name: item.name }, unit_amount: item.prize * 100 }, quantity: item.amount }; }),
-            success_url: process.env.SERVER_URL + "/main",
+            success_url: process.env.SERVER_URL + "/order-completed",
             cancel_url: process.env.SERVER_URL + "/main"
         });
         res.send({ msg: "melo by vratit url stripu", url: session.url, next_status: undefined });
@@ -185,7 +185,7 @@ exports.router.post('/refund_request', request_data_transformer_js_1.default, ch
         var code = Math.floor(100000 + Math.random() * 900000).toString();
         (0, send_emails_js_1.default)([req.body.transformed_data.email], code);
         var refund_products = yield (0, select_request_js_1.default)("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id WHERE order_id = ?;", req.body.order_data[0].id);
-        res.send({ msg: "order found", next_status: true, status: true, code: code, data: { refunds: [req.body.order_data[0]], order_products: refund_products } });
+        res.send({ msg: "order found", next_status: true, status: true, code: code, data: { orders: [req.body.order_data[0]], order_products: refund_products } });
     });
 }));
 exports.router.post('/send_aut_code', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
@@ -321,7 +321,6 @@ exports.router.post('/get_admin_refunds', (0, try_catch_js_1.default)(function (
 exports.router.post('/check_for_admin', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var id = Number((yield (0, select_request_js_1.default)("SELECT id FROM users WHERE email = ? AND password = ? ;", [JSON.parse(req.body.email), JSON.parse(req.body.password)]))[0].id);
-        console.log("🚀 ~ id:", id);
         if (id === Number(process.env.ADMIN_ID)) {
             res.send({ msg: "user is admin", next_status: true });
         }
