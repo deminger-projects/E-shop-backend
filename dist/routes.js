@@ -89,8 +89,8 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
             mode: "payment",
             customer: customer.id,
             line_items: items.products.map((item) => { return { price_data: { currency: "usd", product_data: { name: item.name }, unit_amount: item.prize * 100 }, quantity: item.amount }; }),
-            success_url: process.env.SERVER_URL + "/order-completed",
-            cancel_url: process.env.SERVER_URL + "/main"
+            success_url: process.env.PAGE_URL + "/order-completed",
+            cancel_url: process.env.PAGE_URL + "/main"
         });
         res.send({ msg: "melo by vratit url stripu", url: session.url, next_status: undefined });
     });
