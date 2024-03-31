@@ -502,6 +502,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   router.post('/check_for_admin', try_catch(async function (req: Request, res: Response) {   
 
     var id = Number((await select_request("SELECT id FROM users WHERE email = ? AND password = ? ;", [JSON.parse(req.body.email), JSON.parse(req.body.password)]))[0].id)
+    console.log("🚀 ~ id:", id)
 
     if(id === Number(process.env.ADMIN_ID)){
       res.send({msg: "user is admin", next_status: true})

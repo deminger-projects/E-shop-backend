@@ -321,6 +321,7 @@ exports.router.post('/get_admin_refunds', (0, try_catch_js_1.default)(function (
 exports.router.post('/check_for_admin', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var id = Number((yield (0, select_request_js_1.default)("SELECT id FROM users WHERE email = ? AND password = ? ;", [JSON.parse(req.body.email), JSON.parse(req.body.password)]))[0].id);
+        console.log("🚀 ~ id:", id);
         if (id === Number(process.env.ADMIN_ID)) {
             res.send({ msg: "user is admin", next_status: true });
         }
