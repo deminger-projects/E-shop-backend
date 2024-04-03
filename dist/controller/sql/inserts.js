@@ -37,7 +37,7 @@ function sql_inserts(table, columns, values, last_inserted_id) {
                     console.log("🚀 ~ file: sql_select.ts:22 ~ pool.getConnection ~ conn_err:", conn_err.message);
                 }
                 else {
-                    conn.query(sql, [values], (err, result, fiels) => {
+                    conn.query(sql, [values], (err, result) => {
                         conn.release();
                         if (err) {
                             console.log("🚀 ~ file: sql_select.ts:21 ~ pool.query ~ err:", err.message);

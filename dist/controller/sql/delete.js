@@ -19,7 +19,7 @@ function sql_delete(table, column, value) {
                     console.log("🚀 ~ file: sql_select.ts:22 ~ pool.getConnection ~ conn_err:", conn_err.message);
                 }
                 else {
-                    conn.query(sql, [value], (err, result, fiels) => {
+                    conn.query(sql, [value], (err, result) => {
                         conn.release();
                         if (err) {
                             console.log("🚀 ~ file: sql_select.ts:21 ~ pool.query ~ err:", err.message);

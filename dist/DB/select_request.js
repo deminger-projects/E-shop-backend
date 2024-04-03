@@ -8,7 +8,7 @@ function select_request(sql, values) {
                 console.log("select_request; 🚀 ~ pool.getConnection ~ conn_err:", conn_err.message);
             }
             else {
-                conn.query(sql, values, (err, result, fiels) => {
+                conn.query(sql, values, (err, result) => {
                     conn.release();
                     if (err) {
                         console.log("select_request; 🚀 ~ conn.query ~ err:", err.message);

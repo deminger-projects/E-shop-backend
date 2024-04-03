@@ -22,11 +22,11 @@ export default function sql_update(table: string, columns: Array<string>, values
     var sql = "UPDATE " + table + " SET " + seter + "WHERE id = ? ;"
     
     return new Promise<{affected_rows: number, msg: string}>((resolve, reject) => {
-      pool.getConnection((conn_err, conn) => {
+      pool.getConnection((conn_err: any, conn: any) => {
         if(conn_err){
           console.log("🚀 ~ file: sql_select.ts:22 ~ pool.getConnection ~ conn_err:", conn_err.message)
         }else{
-          conn.query(sql, values, (err, result, fiels) => {
+          conn.query(sql, values, (err: any, result: any) => {
             conn.release();
             if(err){
               console.log("🚀 ~ file: sql_select.ts:21 ~ pool.query ~ err:", err.message)
