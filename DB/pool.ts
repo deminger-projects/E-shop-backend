@@ -1,4 +1,4 @@
-import * as mysql from "mysql"
+const mysql = require('mysql2')
 
   export const pool = mysql.createPool({
     host: 'monorail.proxy.rlwy.net',
@@ -6,5 +6,6 @@ import * as mysql from "mysql"
     password: 'kNCTPsadaPxbNEUNROgvqaZjNNkHtIdE',
     database: 'railway',   
     connectionLimit: 10,
-    multipleStatements: false
+    multipleStatements: false, 
+    port: 52153
   })
