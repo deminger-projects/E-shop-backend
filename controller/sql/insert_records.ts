@@ -47,3 +47,4 @@ export default async function insert_records(tables: Array<string>, columns: Arr
     return record_id
   }
   
+  

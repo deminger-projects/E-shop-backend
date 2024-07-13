@@ -19,5 +19,4 @@ export default function select_request(sql: string, values?: Array<string>){
             }
         })
     })
-
 }

@@ -26,4 +26,5 @@ const login_request_validation = async(req: Request, res: Response, next: NextFu
     next()
 }
 
-export default login_request_validation
+export default login_request_validation 
+

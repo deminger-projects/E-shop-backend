@@ -18,3 +18,4 @@ export default async function validate_user_data(req: Request, res: Response, ne
       
     next() 
 } 
+

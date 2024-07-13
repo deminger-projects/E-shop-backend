@@ -2,22 +2,21 @@ import * as nodemailer from "nodemailer"
 import receipt_template from "./receipt_template";
 
 export default function send_receipt(email: string, products: any, order_id: number){
-console.log("🚀 ~ send_receipt ~ products:", products)
 
     var transporter = nodemailer.createTransport({
         host: 'smtp.seznam.cz',
         port: 465,
         secure: true, // use SSL
         auth: {
-            user: 'test2584884@seznam.cz',
-            pass: 'test.test1'
+            user: process.env.COMPANY_EMAIL,
+            pass: process.env.COMPANY_EMAIL_PSW
         }
         });
 
         var html_template = receipt_template(products, order_id)
         
         var mailOptions = {
-          from: 'test2584884@seznam.cz',
+          from: process.env.COMPANY_EMAIL,
           to: email,
           subject: 'order receipt',
           html : html_template
@@ -30,5 +29,4 @@ console.log("🚀 ~ send_receipt ~ products:", products)
             console.log('Email sent: ' + info.response);
           }
       })
-    
 }
