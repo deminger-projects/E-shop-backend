@@ -5,6 +5,7 @@ function select_request(sql, values) {
     return new Promise((resolve, reject) => {
         pool_1.pool.getConnection((conn_err, conn) => {
             if (conn_err) {
+                console.log("🚀 ~ pool.getConnection ~ conn_err:", conn_err);
                 console.log("select_request; 🚀 ~ pool.getConnection ~ conn_err:", conn_err.message);
             }
             else {

@@ -1,4 +1,4 @@
-import { pool } from "./pool";
+import { pool } from "./pool"; 
 
 export default function select_request(sql: string, values?: Array<string>){
 
@@ -6,6 +6,7 @@ export default function select_request(sql: string, values?: Array<string>){
 
         pool.getConnection((conn_err: any, conn: any) => {
             if(conn_err){
+                console.log("🚀 ~ pool.getConnection ~ conn_err:", conn_err)
                 console.log("select_request; 🚀 ~ pool.getConnection ~ conn_err:", conn_err.message)
             }else{
                 conn.query(sql, values, (err: any, result: any) => {
@@ -16,7 +17,7 @@ export default function select_request(sql: string, values?: Array<string>){
                         resolve(result)
                     }
                 })
-            }
-        })
+            } 
+        }) 
     })
 }
