@@ -24,6 +24,8 @@ import modify_images from "./controller/file_handlers/modify_images.js";
 import validate_user_data from "./controller/middleware/validate_user_data.js";
 import send_receipt from "./controller/emails/send_receipt.js";
 
+
+
 //const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 const stripe = require("stripe")('sk_test_51OHsB9C2agLPKl6uq4bSJh45m0Jl4tVzcdIFxiednewjV17crrnvGYoslGSfS4dBwH1OjNJpc3I3TS6ZCboS5tiN00xHXbm7Oy')
 var endpointSecret: any = undefined
