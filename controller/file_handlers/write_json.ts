@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 
-import sql_select from "../../model/sql/select.js";
 import select_request from '../../DB/select_request.js';
 
 export default async function write_json (sql_tasks: Array<string>, file?: string){ // gets data from DB and imports them to json file

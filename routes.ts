@@ -298,7 +298,11 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/main_page_request', try_catch(async function (req: Request, res: Response) {   
 
-    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';"])])
+    var last_item_id = req.body.last_item_id
+
+    console.log(last_item_id)
+
+    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' AND products.id > " + last_item_id + " LIMIT 9;"])])
 
     res.send(JSON.parse(data))
 
@@ -342,11 +346,17 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/get_collections_showcase', try_catch(async function (req: Request, res: Response) {   
 
-    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active' AND (SELECT COUNT(products.id) FROM products WHERE products.collection_id = collections.id);",
-    "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+    var last_item_id = req.body.last_item_id
+
+    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active' AND (SELECT COUNT(products.id) FROM products WHERE products.collection_id = collections.id) AND collections.id > " + last_item_id + " LIMIT 9;"])])
     
     res.send(JSON.parse(data))
   
+
+    // old code 
+    //var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active' AND (SELECT COUNT(products.id) FROM products WHERE products.collection_id = collections.id) AND collections.id > " + last_item_id + " LIMIT 9;",
+    //   "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+      
 
   }))
 
@@ -355,7 +365,9 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const id = req.body.id
 
-    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' AND products.collection_id = " + id + " AND products.status = 'Active';"])])
+    var last_item_id = req.body.last_item_id
+
+    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' AND products.collection_id = " + id + " AND products.status = 'Active' AND products.id > " + last_item_id + " LIMIT 9;"])])
     
     res.send(JSON.parse(data))
   
@@ -412,9 +424,11 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/get_user_avaible_returns', validate_user_data, try_catch(async function (req: Request, res: Response) {   
 
+    var last_item_id = req.body.last_item_id
+
     const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && orders.add_date + INTERVAL -30 DAY <= NOW();;",
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && orders.add_date + INTERVAL -30 DAY <= NOW() AND orders.id > " + last_item_id + " LIMIT 9;",
     
     "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
     
@@ -436,9 +450,11 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
   router.post('/get_user_placed_orders', validate_user_data, try_catch(async function (req: Request, res: Response) {   
 
+    var last_item_id = req.body.last_item_id
+    
     const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + ";", 
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + " AND orders.id > " + last_item_id + " LIMIT 9;", 
     
     "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
 
@@ -452,14 +468,16 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
 
 
-
+ 
 
 
   
   router.post('/get_admin_collections', try_catch(async function (req: Request, res: Response) {   
 
-    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
-    "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+    // var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
+    // "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+
+    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';"])])
 
     res.send(JSON.parse(data))
 
@@ -467,11 +485,33 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
 
 
-  router.post('/get_admin_products', try_catch(async function (req: Request, res: Response) {   
+router.post('/get_collection_by_id', try_catch(async function (req: Request, res: Response) {   
 
-    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%';", 
+    // var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active';",
+    // "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+
+    const id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT collections.id, collections.name, DATE_FORMAT(collections.add_date, '%Y-%m-%d') as add_date, collection_images.image_url FROM collections JOIN collection_images ON collection_images.collection_id = collections.id WHERE collection_images.image_url LIKE '%_main%' AND collections.status = 'Active' AND collections.id = " + id + ";",
+    "SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = $"])])
+    console.log("🚀 ~ data:", data)
+
+    res.send(JSON.parse(data))
+
+  }))
+
+
+
+
+  router.post('/get_admin_products', try_catch(async function (req: Request, res: Response) {  
     
-    "SELECT product_sizes.size, product_sizes.current_amount FROM product_sizes WHERE product_sizes.product_id = $ ;", "SELECT product_images.image_url FROM product_images WHERE product_images.product_id = $ ;"])])
+    var last_item_id = req.body.last_item_id
+
+    // var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' AND products.id > " +last_item_id+ " LIMIT 9;", 
+    
+    // "SELECT product_sizes.size, product_sizes.current_amount FROM product_sizes WHERE product_sizes.product_id = $ ;", "SELECT product_images.image_url FROM product_images WHERE product_images.product_id = $ ;"])])
+
+    var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' ;"])])
 
     res.send(JSON.parse(data))
 
