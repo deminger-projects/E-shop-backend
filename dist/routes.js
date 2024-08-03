@@ -317,6 +317,20 @@ exports.router.post('/get_collection_by_id', (0, try_catch_js_1.default)(functio
         res.send(JSON.parse(data));
     });
 }));
+exports.router.post('/get_admin_products_images', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT product_images.image_url FROM product_images WHERE product_images.product_id = " + id + ";"])]);
+        res.send(JSON.parse(data));
+    });
+}));
+exports.router.post('/get_admin_collection_images', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var id = req.body.id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_ id = " + id + ";"])]);
+        res.send(JSON.parse(data));
+    });
+}));
 exports.router.post('/get_admin_products', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var last_item_id = req.body.last_item_id;

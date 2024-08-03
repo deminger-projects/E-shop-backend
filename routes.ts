@@ -501,6 +501,26 @@ router.post('/get_collection_by_id', try_catch(async function (req: Request, res
   }))
 
 
+  router.post('/get_admin_products_images', try_catch(async function (req: Request, res: Response) {  
+
+    var id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT product_images.image_url FROM product_images WHERE product_images.product_id = " + id + ";"])])
+
+    res.send(JSON.parse(data))
+
+  }))
+
+  router.post('/get_admin_collection_images', try_catch(async function (req: Request, res: Response) {  
+
+    var id = req.body.id
+
+    var data: any = await Promise.all([write_json(["SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_ id = " + id + ";"])])
+
+    res.send(JSON.parse(data))
+
+  }))
+
 
 
   router.post('/get_admin_products', try_catch(async function (req: Request, res: Response) {  
