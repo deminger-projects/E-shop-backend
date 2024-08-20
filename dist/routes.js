@@ -135,7 +135,7 @@ exports.router.post('/generate_order_code', (0, try_catch_js_1.default)(function
             }
         });
         var order_code = yield test();
-        res.send({ order_code: order_code, msg: 'unikatni order code' });
+        res.send(order_code);
     });
 }));
 exports.router.post('/login_request', request_data_transformer_js_1.default, login_request_validation_js_1.default, (0, try_catch_js_1.default)(function (req, res) {

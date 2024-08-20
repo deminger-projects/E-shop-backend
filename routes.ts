@@ -166,7 +166,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var order_code = await test()
     
-    res.send({order_code: order_code, msg: 'unikatni order code'})
+    res.send(order_code)
 
   }))
 
