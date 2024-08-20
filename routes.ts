@@ -76,7 +76,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
-    send_receipt(transformed_data.email, JSON.parse(cart_data), JSON.stringify(order_code))
+    send_receipt(transformed_data.email, JSON.parse(cart_data), JSON.stringify(order_code.order_code))
   }
   
   res.send().end;

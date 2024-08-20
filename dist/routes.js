@@ -70,7 +70,7 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
             var cart_data = JSON.parse(cunstomer_data.metadata.cart);
             var order_code = JSON.parse(cunstomer_data.metadata.order_code);
             yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
-            (0, send_receipt_js_1.default)(transformed_data.email, JSON.parse(cart_data), JSON.stringify(order_code));
+            (0, send_receipt_js_1.default)(transformed_data.email, JSON.parse(cart_data), JSON.stringify(order_code.order_code));
         }
         res.send().end;
     });
