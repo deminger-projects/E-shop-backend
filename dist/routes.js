@@ -70,7 +70,7 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
             var cart_data = JSON.parse(cunstomer_data.metadata.cart);
             var order_code = JSON.parse(cunstomer_data.metadata.order_code);
             yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
-            (0, send_receipt_js_1.default)(transformed_data.email, JSON.parse(cart_data), JSON.stringify(order_code.order_code));
+            (0, send_receipt_js_1.default)(transformed_data.email, JSON.parse(cart_data), order_code);
         }
         res.send().end;
     });
@@ -89,7 +89,7 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
             metadata: {
                 data: JSON.stringify(req.body.transformed_data),
                 cart: JSON.stringify(req.body.cart),
-                order_code: JSON.stringify(req.body.order_code)
+                order_code: req.body.order_code
             }
         });
         const session = yield stripe.checkout.sessions.create({
@@ -135,7 +135,7 @@ exports.router.post('/generate_order_code', (0, try_catch_js_1.default)(function
             }
         });
         var order_code = yield test();
-        res.send(order_code);
+        res.send({ order_code: order_code });
     });
 }));
 exports.router.post('/login_request', request_data_transformer_js_1.default, login_request_validation_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
