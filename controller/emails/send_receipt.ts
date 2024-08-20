@@ -2,6 +2,7 @@ import * as nodemailer from "nodemailer"
 import receipt_template from "./receipt_template";
 
 export default function send_receipt(email: string, products: any, order_code: string){
+console.log("🚀 ~ send_receipt ~ order_code:", order_code)
 
     var transporter = nodemailer.createTransport({
         host: 'smtp.seznam.cz',

@@ -72,11 +72,11 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var transformed_data = JSON.parse(cunstomer_data.metadata.data)
     var cart_data = JSON.parse(cunstomer_data.metadata.cart)
-    var order_code = cunstomer_data.metadata.order_code
+    var order_code = JSON.parse(cunstomer_data.metadata.order_code)
 
     await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
-    send_receipt(transformed_data.email, JSON.parse(cart_data), order_code)
+    send_receipt(transformed_data.email, JSON.parse(cart_data), JSON.parse(order_code))
   }
   
   res.send().end;
@@ -103,7 +103,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
       metadata: {
         data: JSON.stringify(req.body.transformed_data),
         cart: JSON.stringify(req.body.cart),
-        order_code: JSON.stringify(req.body.order_code.order_code)
+        order_code: JSON.stringify(req.body.order_code)
       }
     }) 
 
