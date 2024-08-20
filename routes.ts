@@ -94,15 +94,15 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
         data: JSON.stringify(req.body.transformed_data),
         cart: JSON.stringify(req.body.cart)
       }
-    })
+    }) 
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ["card", "paypal"],
       mode: "payment",
       customer: customer.id,
       line_items: items.products.map((item: any) => {return {price_data: {currency: "usd", product_data: {name: item.name}, unit_amount: item.prize * 100}, quantity: item.amount}}),
       success_url: process.env.PAGE_URL + "/order-completed",
-      cancel_url: process.env.PAGE_URL + "/main"
+      cancel_url: process.env.PAGE_URL + "/main" 
   }) 
 
   res.send({msg: "melo by vratit url stripu", url: session.url, next_status: undefined})
@@ -377,6 +377,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   router.post('/get_refund_reasons', try_catch(async function (req: Request, res: Response) {   
 
     var data: any = await Promise.all([write_json(["SELECT id, reason FROM refund_reasons"])])
+    console.log("🚀 ~ data:", data)
     
     res.send(JSON.parse(data))
 
@@ -428,7 +429,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && orders.add_date + INTERVAL -30 DAY <= NOW() AND orders.id > " + last_item_id + " LIMIT 9;",
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && (orders.add_date + INTERVAL +30 DAY - NOW()) >= 0 AND orders.id > " + last_item_id + " LIMIT 9;",
     
     "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
     

@@ -14,9 +14,9 @@ export default function modify_images(path: string, record_id: number, folder: s
     for(let file of files){
         sharp(path + file)
         .jpeg()
-        .jpeg({ quality: 100 })
+        .jpeg({ quality: 95 })
         .jpeg({ progressive: true })
-        .resize(1600, 1600)  //full HD pixels >
+        .resize(1680, 1400)  //full HD pixels >
         .toFile("./public/images/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
             if (err) {
             console.error(err);

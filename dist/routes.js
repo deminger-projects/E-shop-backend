@@ -84,7 +84,7 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
             }
         });
         const session = yield stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
+            payment_method_types: ["card", "paypal"],
             mode: "payment",
             customer: customer.id,
             line_items: items.products.map((item) => { return { price_data: { currency: "usd", product_data: { name: item.name }, unit_amount: item.prize * 100 }, quantity: item.amount }; }),
@@ -253,6 +253,7 @@ exports.router.post('/get_collection_product_showcase', (0, try_catch_js_1.defau
 exports.router.post('/get_refund_reasons', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT id, reason FROM refund_reasons"])]);
+        console.log("🚀 ~ data:", data);
         res.send(JSON.parse(data));
     });
 }));
@@ -276,7 +277,7 @@ exports.router.post('/get_user_avaible_returns', validate_user_data_js_1.default
     return __awaiter(this, void 0, void 0, function* () {
         var last_item_id = req.body.last_item_id;
         const id = req.body.user_data.id;
-        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && orders.add_date + INTERVAL -30 DAY <= NOW() AND orders.id > " + last_item_id + " LIMIT 9;",
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && (orders.add_date + INTERVAL +30 DAY - NOW()) >= 0 AND orders.id > " + last_item_id + " LIMIT 9;",
                 "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
         res.send(JSON.parse(data));
     });
