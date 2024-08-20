@@ -1,7 +1,7 @@
 import * as nodemailer from "nodemailer"
 import receipt_template from "./receipt_template";
 
-export default function send_receipt(email: string, products: any, order_id: number){
+export default function send_receipt(email: string, products: any, order_code: string){
 
     var transporter = nodemailer.createTransport({
         host: 'smtp.seznam.cz',
@@ -13,7 +13,7 @@ export default function send_receipt(email: string, products: any, order_id: num
         }
         });
 
-        var html_template = receipt_template(products, order_id)
+        var html_template = receipt_template(products, order_code)
         
         var mailOptions = {
           from: process.env.COMPANY_EMAIL,
