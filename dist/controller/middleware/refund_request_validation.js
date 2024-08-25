@@ -16,9 +16,16 @@ const select_request_1 = __importDefault(require("../../DB/select_request"));
 function refund_request_validation(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const sql = "SELECT * FROM refunds WHERE order_id = ?;";
+        const sql2 = "SELECT * FROM orders WHERE id = ? && (orders.add_date + INTERVAL +30 DAY - NOW()) >= 0;";
         const result = yield (0, select_request_1.default)(sql, req.body.order_data[0].id);
+        console.log("🚀 ~ refund_request_validation ~ result:", result);
+        const result2 = yield (0, select_request_1.default)(sql2, req.body.order_data[0].id);
+        console.log("🚀 ~ refund_request_validation ~ result2:", result2);
         if (result.length > 0) {
             return next(new Error("refund allready placed"));
+        }
+        if (result2.length <= 0) {
+            return next(new Error("refund not avalable (expired after 30 days)"));
         }
         next();
     });

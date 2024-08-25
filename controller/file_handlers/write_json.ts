@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import select_request from '../../DB/select_request.js';
 
 export default async function write_json (sql_tasks: Array<string>, file?: string){ // gets data from DB and imports them to json file
+console.log("🚀 ~ write_json ~ sql_tasks:", sql_tasks)
 
   var table_names: Array<string> = []
 

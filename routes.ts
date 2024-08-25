@@ -72,7 +72,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var transformed_data = JSON.parse(cunstomer_data.metadata.data)
     var cart_data = JSON.parse(cunstomer_data.metadata.cart)
-    var order_code = JSON.parse(cunstomer_data.metadata.order_code)
+    var order_code = cunstomer_data.metadata.order_code
 
     await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
@@ -291,9 +291,9 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     
     var code = Math.floor(100000 + Math.random() * 900000).toString()
 
-    send_emails([req.body.transformed_data.email], code)
+    send_emails([req.body.transformed_data.email], "Potvrzovací kód: " + code)
 
-    var refund_products = await select_request("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id WHERE order_id = ?;", req.body.order_data[0].id)
+    var refund_products = await select_request("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id JOIN orders ON orders.id = order_products.order_id WHERE order_code = ?;", req.body.order_data[0].order_code)
     
     res.send({msg: "order found", next_status: true, status: true, code: code, data: {orders: [req.body.order_data[0]], order_products: refund_products}})
 
@@ -466,7 +466,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && (orders.add_date + INTERVAL +30 DAY - NOW()) >= 0 AND orders.id > " + last_item_id + " LIMIT 9;",
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.status = 'Active' && orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && (orders.add_date + INTERVAL +30 DAY - NOW()) >= 0 AND orders.id > " + last_item_id + " LIMIT 3;",
     
     "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
     
@@ -492,7 +492,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     
     const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + " AND orders.id > " + last_item_id + " LIMIT 9;", 
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + " AND orders.id > " + last_item_id + " LIMIT 3;", 
     
     "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
 
@@ -577,7 +577,9 @@ router.post('/get_collection_by_id', try_catch(async function (req: Request, res
 
   router.post('/get_admin_orders', try_catch(async function (req: Request, res: Response) {   
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.order_code, orders.zasilkovna, orders.country, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders;", 
+    var where_status = req.body.status
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.order_code, orders.zasilkovna, orders.country, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders WHERE orders.status = " + where_status + ";", 
     
     "SELECT order_products.id, order_products.product_id, order_products.size, order_products.amount, products.name, products.price, products.discount, products.collection_id, products.description FROM order_products JOIN products ON products.id = product_id WHERE order_id = $ ;"])])
     res.send(JSON.parse(data))
@@ -587,7 +589,9 @@ router.post('/get_collection_by_id', try_catch(async function (req: Request, res
 
   router.post('/get_admin_refunds', try_catch(async function (req: Request, res: Response) {   
 
-    var data: any = await Promise.all([write_json(["SELECT refunds.id, orders.order_code, orders.id as order_id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders on refunds.order_id = orders.id;",
+    var where_status = req.body.status
+
+    var data: any = await Promise.all([write_json(["SELECT refunds.id, orders.order_code, orders.id as order_id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders on refunds.order_id = orders.id WHERE refunds.status = " + where_status + ";",
     
     "SELECT refund_products.product_id, refund_products.amount, refund_products.size, products.name, refund_reasons.reason, products.price FROM refund_products JOIN products ON products.id = refund_products.product_id JOIN refund_reasons ON refund_reasons.id = refund_products.reason_id JOIN refunds ON refunds.id = refund_products.refund_id WHERE refunds.id = $ ;"])])
 

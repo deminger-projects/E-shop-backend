@@ -68,7 +68,7 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
             var cunstomer_data = yield stripe.customers.retrieve(data.customer);
             var transformed_data = JSON.parse(cunstomer_data.metadata.data);
             var cart_data = JSON.parse(cunstomer_data.metadata.cart);
-            var order_code = JSON.parse(cunstomer_data.metadata.order_code);
+            var order_code = cunstomer_data.metadata.order_code;
             yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
             (0, send_receipt_js_1.default)(transformed_data.email, JSON.parse(cart_data), order_code);
         }
@@ -207,8 +207,8 @@ exports.router.post('/change_record_status', request_data_transformer_js_1.defau
 exports.router.post('/refund_request', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, refund_request_validation_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var code = Math.floor(100000 + Math.random() * 900000).toString();
-        (0, send_emails_js_1.default)([req.body.transformed_data.email], code);
-        var refund_products = yield (0, select_request_js_1.default)("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id WHERE order_id = ?;", req.body.order_data[0].id);
+        (0, send_emails_js_1.default)([req.body.transformed_data.email], "Potvrzovací kód: " + code);
+        var refund_products = yield (0, select_request_js_1.default)("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id JOIN orders ON orders.id = order_products.order_id WHERE order_code = ?;", req.body.order_data[0].order_code);
         res.send({ msg: "order found", next_status: true, status: true, code: code, data: { orders: [req.body.order_data[0]], order_products: refund_products } });
     });
 }));
@@ -302,7 +302,7 @@ exports.router.post('/get_user_avaible_returns', validate_user_data_js_1.default
     return __awaiter(this, void 0, void 0, function* () {
         var last_item_id = req.body.last_item_id;
         const id = req.body.user_data.id;
-        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && (orders.add_date + INTERVAL +30 DAY - NOW()) >= 0 AND orders.id > " + last_item_id + " LIMIT 9;",
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date FROM orders WHERE orders.status = 'Active' && orders.user_id = " + id + " && (SELECT COUNT(refunds.id) FROM refunds WHERE orders.id = refunds.order_id && user_id = " + id + ") < 1 && (orders.add_date + INTERVAL +30 DAY - NOW()) >= 0 AND orders.id > " + last_item_id + " LIMIT 3;",
                 "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
         res.send(JSON.parse(data));
     });
@@ -319,7 +319,7 @@ exports.router.post('/get_user_placed_orders', validate_user_data_js_1.default, 
     return __awaiter(this, void 0, void 0, function* () {
         var last_item_id = req.body.last_item_id;
         const id = req.body.user_data.id;
-        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + " AND orders.id > " + last_item_id + " LIMIT 9;",
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status, (SELECT count(refunds.id) FROM refunds WHERE orders.id = refunds.order_id AND refunds.status = 'Active') as refund_count FROM orders WHERE user_id = " + id + " AND orders.id > " + last_item_id + " LIMIT 3;",
                 "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
         res.send(JSON.parse(data));
     });
@@ -368,14 +368,16 @@ exports.router.post('/get_admin_products', (0, try_catch_js_1.default)(function 
 }));
 exports.router.post('/get_admin_orders', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.order_code, orders.zasilkovna, orders.country, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders;",
+        var where_status = req.body.status;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.order_code, orders.zasilkovna, orders.country, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, orders.status FROM orders WHERE orders.status = " + where_status + ";",
                 "SELECT order_products.id, order_products.product_id, order_products.size, order_products.amount, products.name, products.price, products.discount, products.collection_id, products.description FROM order_products JOIN products ON products.id = product_id WHERE order_id = $ ;"])]);
         res.send(JSON.parse(data));
     });
 }));
 exports.router.post('/get_admin_refunds', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT refunds.id, orders.order_code, orders.id as order_id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders on refunds.order_id = orders.id;",
+        var where_status = req.body.status;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT refunds.id, orders.order_code, orders.id as order_id, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders on refunds.order_id = orders.id WHERE refunds.status = " + where_status + ";",
                 "SELECT refund_products.product_id, refund_products.amount, refund_products.size, products.name, refund_reasons.reason, products.price FROM refund_products JOIN products ON products.id = refund_products.product_id JOIN refund_reasons ON refund_reasons.id = refund_products.reason_id JOIN refunds ON refunds.id = refund_products.refund_id WHERE refunds.id = $ ;"])]);
         res.send(JSON.parse(data));
     });
