@@ -31,6 +31,7 @@ const write_json_js_1 = __importDefault(require("./controller/file_handlers/writ
 const modify_images_js_1 = __importDefault(require("./controller/file_handlers/modify_images.js"));
 const validate_user_data_js_1 = __importDefault(require("./controller/middleware/validate_user_data.js"));
 const send_receipt_js_1 = __importDefault(require("./controller/emails/send_receipt.js"));
+const bcrypt = require('bcrypt');
 //const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 const stripe = require("stripe")('sk_test_51OHsB9C2agLPKl6uq4bSJh45m0Jl4tVzcdIFxiednewjV17crrnvGYoslGSfS4dBwH1OjNJpc3I3TS6ZCboS5tiN00xHXbm7Oy');
 var endpointSecret = undefined;
@@ -164,6 +165,28 @@ exports.router.post('/register_request', request_data_transformer_js_1.default, 
         res.send({ msg: "user registred", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
     });
 }));
+exports.router.post('/check_password', (0, try_catch_js_1.default)(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var user_input = JSON.parse(req.body.userInputPassword);
+        var storedHashedPassword = JSON.parse(req.body.storedHashedPassword);
+        var psw_check_result = yield new Promise((res, rej) => {
+            bcrypt.compare(user_input, storedHashedPassword, (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+                var obj;
+                if (result) {
+                    obj = { msg: "passwords match", next_status: true, status: true };
+                }
+                else {
+                    obj = { msg: "passwords do not match", next_status: false, status: false };
+                }
+                res(obj);
+            });
+        });
+        res.send(psw_check_result);
+    });
+}));
 exports.router.post('/add_record', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const transformed_data = req.body.transformed_data;
@@ -229,7 +252,6 @@ exports.router.post('/get_user_data', validate_user_data_js_1.default, (0, try_c
 exports.router.post('/main_page_request', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var last_item_id = req.body.last_item_id;
-        console.log(last_item_id);
         var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' AND products.id > " + last_item_id + " LIMIT 9;"])]);
         res.send(JSON.parse(data));
     });
@@ -310,7 +332,8 @@ exports.router.post('/get_user_avaible_returns', validate_user_data_js_1.default
 exports.router.post('/get_user_place_returns', validate_user_data_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const id = req.body.user_data.id;
-        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders ON orders.id = refunds.order_id WHERE orders.user_id = " + id + ";",
+        var last_item_id = req.body.last_item_id;
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders ON orders.id = refunds.order_id WHERE orders.user_id = " + id + " AND orders.id > " + last_item_id + " LIMIT 3;",
                 "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])]);
         res.send(JSON.parse(data));
     });
@@ -353,7 +376,9 @@ exports.router.post('/get_admin_products_images', (0, try_catch_js_1.default)(fu
 exports.router.post('/get_admin_collection_images', (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var id = req.body.id;
-        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_ id = " + id + ";"])]);
+        console.log("🚀 ~ id:", id);
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = " + id + ";"])]);
+        console.log("🚀 ~ data:", data);
         res.send(JSON.parse(data));
     });
 }));

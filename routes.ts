@@ -25,6 +25,7 @@ import validate_user_data from "./controller/middleware/validate_user_data.js";
 import send_receipt from "./controller/emails/send_receipt.js";
 
 
+const bcrypt = require('bcrypt');
 
 //const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 const stripe = require("stripe")('sk_test_51OHsB9C2agLPKl6uq4bSJh45m0Jl4tVzcdIFxiednewjV17crrnvGYoslGSfS4dBwH1OjNJpc3I3TS6ZCboS5tiN00xHXbm7Oy')
@@ -219,10 +220,43 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     res.send({msg: "user registred", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
 
   }))
-
-
  
 
+  router.post('/check_password', try_catch(async function (req: Request, res: Response) {   
+
+    var user_input = JSON.parse(req.body.userInputPassword)
+
+    var storedHashedPassword = JSON.parse(req.body.storedHashedPassword)
+
+    var psw_check_result = await new Promise((res, rej) => {bcrypt.compare(user_input, storedHashedPassword, (err: any, result: any) => {
+
+      if(err){
+        console.log(err)
+      } 
+
+      var obj 
+
+      if(result){
+
+      obj = {msg: "passwords match", next_status: true, status: true}
+ 
+
+      }else{
+
+        obj = {msg: "passwords do not match", next_status: false, status: false}
+
+      }
+
+      res(obj)
+
+    })})
+
+    res.send(psw_check_result)
+    
+  }))
+
+ 
+ 
 
 
 
@@ -336,8 +370,6 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   router.post('/main_page_request', try_catch(async function (req: Request, res: Response) {   
 
     var last_item_id = req.body.last_item_id
-
-    console.log(last_item_id)
 
     var data: any = await Promise.all([write_json(["SELECT products.id, products.name as product_name, products.price, DATE_FORMAT(products.add_date, '%Y-%m-%d') as add_date, products.discount, products.description, product_images.image_url as 'url', collections.id as collection_id, collections.name as collection_name from products left join collections on collections.id = products.collection_id join product_images on product_images.product_id = products.id WHERE products.status = 'Active' AND product_images.image_url like '%_main.%' AND products.id > " + last_item_id + " LIMIT 9;"])])
 
@@ -478,7 +510,9 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders ON orders.id = refunds.order_id WHERE orders.user_id = " + id + ";",
+    var last_item_id = req.body.last_item_id
+
+    var data: any = await Promise.all([write_json(["SELECT orders.id, orders.order_code, orders.name, orders.surname, orders.email, orders.adress, orders.phone, orders.postcode, DATE_FORMAT(orders.add_date, '%Y-%m-%d') as add_date, refunds.status FROM refunds JOIN orders ON orders.id = refunds.order_id WHERE orders.user_id = " + id + " AND orders.id > " + last_item_id + " LIMIT 3;",
     
     "SELECT order_products.id, order_products.product_id, products.name, order_products.size, order_products.amount, order_products.prize, product_images.image_url FROM order_products JOIN products on order_products.product_id = products.id JOIN product_images on product_images.product_id = order_products.product_id WHERE order_id = $ AND product_images.image_url LIKE '%_main%';"])])
     
@@ -552,8 +586,10 @@ router.post('/get_collection_by_id', try_catch(async function (req: Request, res
   router.post('/get_admin_collection_images', try_catch(async function (req: Request, res: Response) {  
 
     var id = req.body.id
+    console.log("🚀 ~ id:", id)
 
-    var data: any = await Promise.all([write_json(["SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_ id = " + id + ";"])])
+    var data: any = await Promise.all([write_json(["SELECT collection_images.image_url FROM collection_images WHERE collection_images.collection_id = " + id + ";"])])
+    console.log("🚀 ~ data:", data)
 
     res.send(JSON.parse(data))
 
