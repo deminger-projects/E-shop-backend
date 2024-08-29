@@ -97,7 +97,7 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
             payment_method_types: ["card", "paypal"],
             mode: "payment",
             customer: customer.id,
-            line_items: items.products.map((item) => { return { price_data: { currency: "usd", product_data: { name: item.name }, unit_amount: item.prize * 100 }, quantity: item.amount }; }),
+            line_items: items.products.map((item) => { return { price_data: { currency: "eur", product_data: { name: item.name }, unit_amount: item.prize * 100 }, quantity: item.amount }; }),
             success_url: process.env.PAGE_URL + "/order-completed",
             cancel_url: process.env.PAGE_URL + "/main"
         });
@@ -144,7 +144,7 @@ exports.router.post('/login_request', request_data_transformer_js_1.default, log
         yield (0, update_records_js_1.default)(["users"], [["login_status"]], [[["Active"]]], req.body.login_request_validation.user_id);
         const user_data = yield (0, select_request_js_1.default)("SELECT username, email, password, login_status FROM users WHERE id = ?", req.body.login_request_validation.user_id);
         const user_account_data = yield (0, select_request_js_1.default)("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.login_request_validation.user_id);
-        res.send({ msg: "user loged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
+        res.send({ msg: "User successfully logged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
     });
 }));
 exports.router.post('/logoff_request', validate_user_data_js_1.default, request_data_transformer_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
@@ -153,7 +153,7 @@ exports.router.post('/logoff_request', validate_user_data_js_1.default, request_
         yield (0, update_records_js_1.default)(["users"], [["login_status"]], [[["Inactive"]]], record_id);
         const user_data = yield (0, select_request_js_1.default)("SELECT id, username, email, password, login_status FROM users WHERE id = ?", record_id);
         const user_account_data = yield (0, select_request_js_1.default)("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", record_id);
-        res.send({ msg: "user loged off", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
+        res.send({ msg: "User successfully logged off", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
     });
 }));
 exports.router.post('/register_request', request_data_transformer_js_1.default, register_request_validation_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
@@ -162,7 +162,7 @@ exports.router.post('/register_request', request_data_transformer_js_1.default, 
         const record_id = yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
         const user_data = yield (0, select_request_js_1.default)("SELECT id, username, email, password, login_status FROM users WHERE id = ?", [record_id.toString()]);
         const user_account_data = yield (0, select_request_js_1.default)("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", [record_id.toString()]);
-        res.send({ msg: "user registred", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
+        res.send({ msg: "User successfully registered", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data });
     });
 }));
 exports.router.post('/check_password', (0, try_catch_js_1.default)(function (req, res) {
@@ -195,7 +195,7 @@ exports.router.post('/add_record', request_data_transformer_js_1.default, check_
             yield (0, save_files_js_1.default)("./public/images/temp/", req.files);
             (0, modify_images_js_1.default)("./public/images/temp/", record_id, JSON.parse(req.body.folder));
         }
-        res.send({ msg: "record added", next_status: true, status: true });
+        res.send({ msg: "Record successfully added", next_status: true, status: true });
     });
 }));
 exports.router.post('/edit_record', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
@@ -215,9 +215,9 @@ exports.router.post('/edit_record', request_data_transformer_js_1.default, check
             yield (0, update_files_js_1.default)(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id));
         }
         if (req.body.psw_change) {
-            return res.send({ msg: "password changed", next_status: true });
+            return res.send({ msg: "Password successfully changed", next_status: true });
         }
-        res.send({ msg: "record edited", next_status: true });
+        res.send({ msg: "Record successfully edited", next_status: true });
     });
 }));
 exports.router.post('/change_record_status', request_data_transformer_js_1.default, (0, try_catch_js_1.default)(function (req, res) {

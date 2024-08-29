@@ -112,7 +112,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
       payment_method_types: ["card", "paypal"],
       mode: "payment",
       customer: customer.id,
-      line_items: items.products.map((item: any) => {return {price_data: {currency: "usd", product_data: {name: item.name}, unit_amount: item.prize * 100}, quantity: item.amount}}),
+      line_items: items.products.map((item: any) => {return {price_data: {currency: "eur", product_data: {name: item.name}, unit_amount: item.prize * 100}, quantity: item.amount}}),
       success_url: process.env.PAGE_URL + "/order-completed",
       cancel_url: process.env.PAGE_URL + "/main" 
   }) 
@@ -188,7 +188,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", req.body.login_request_validation.user_id)
 
-    res.send({msg: "user loged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
+    res.send({msg: "User successfully logged in", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
  
   }))
  
@@ -202,7 +202,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", record_id)
 
-    res.send({msg: "user loged off", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data })
+    res.send({msg: "User successfully logged off", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data })
 
   }))
 
@@ -217,7 +217,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const user_account_data = await select_request("SELECT id, name, surname, phone, adress, city, postcode FROM user_data WHERE user_id = ?", [record_id.toString()])
      
-    res.send({msg: "user registred", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
+    res.send({msg: "User successfully registered", next_status: true, status: true, user_data: user_data, user_account_data: user_account_data})
 
   }))
  
@@ -274,7 +274,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
       modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
     }
 
-    res.send({msg: "record added", next_status: true, status: true})
+    res.send({msg: "Record successfully added", next_status: true, status: true})
 
   }))  
 
@@ -296,10 +296,10 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     }
 
     if(req.body.psw_change){
-      return res.send({msg: "password changed", next_status: true})
+      return res.send({msg: "Password successfully changed", next_status: true})
     }
 
-    res.send({msg: "record edited", next_status: true})
+    res.send({msg: "Record successfully edited", next_status: true})
   }))  
 
 
