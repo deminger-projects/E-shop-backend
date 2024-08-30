@@ -44,13 +44,13 @@ export default function receipt_template(products: Array<any>, order_code: strin
 
             products_string += "<td> " + customer_obj.email + " </td>"
 
-            products_string += "<td> " + customer_obj.telephone + " </td>"
+            products_string += "<td> " + customer_obj.phone + " </td>"
 
             products_string += "<td> " + customer_obj.adress + " </td>"
 
             products_string += "<td> " + customer_obj.city + " </td>"
 
-            products_string += "<td> " + customer_obj.PSC + " </td>"
+            products_string += "<td> " + customer_obj.postcode + " </td>"
 
         products_string += "</tr>"
 
