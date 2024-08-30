@@ -75,7 +75,7 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
             var cart_data = JSON.parse(cunstomer_data.metadata.cart);
             var order_code = cunstomer_data.metadata.order_code;
             yield (0, insert_records_js_1.default)(tables, columns, values);
-            (0, send_receipt_js_1.default)(email, JSON.parse(cart_data), order_code, customer_obj);
+            (0, send_receipt_js_1.default)(email, cart_data, order_code, customer_obj);
         }
         res.send().end;
     });
@@ -89,7 +89,6 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
             prize: req.body.delivery_price,
             amount: 1
         };
-        //data: JSON.stringify(req.body.transformed_data),
         items.push(delivery);
         const customer = yield stripe.customers.create({
             metadata: {

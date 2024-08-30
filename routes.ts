@@ -84,13 +84,13 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     await insert_records(tables, columns, values)
 
-    send_receipt(email, JSON.parse(cart_data), order_code, customer_obj)
+    send_receipt(email, cart_data, order_code, customer_obj)
   }
   
   res.send().end;
 }));
 
- 
+  
   //stripe webhook  
 
  
@@ -104,7 +104,6 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
       prize: req.body.delivery_price,
       amount: 1
     }
-    //data: JSON.stringify(req.body.transformed_data),
 
     items.push(delivery)
 
