@@ -97,17 +97,17 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     var customer_obj = JSON.parse(req.body.customer_obj)
 
     var delivery = {
-      name: "Doprava",
+      name: "Delivery",
       prize: req.body.delivery_price,
       amount: 1
     }
  
-    items.products.push(delivery)
+    items.push(delivery)
 
     const customer = await stripe.customers.create({
       metadata: {
         data: JSON.stringify(req.body.transformed_data),
-        cart: JSON.stringify(req.body.cart.cart_items_for_stripe_paywall),
+        cart: JSON.stringify(items),
         order_code: req.body.order_code,
         customer_obj: JSON.stringify(customer_obj)
       }
@@ -117,7 +117,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
       payment_method_types: ["card", "paypal"],
       mode: "payment",
       customer: customer.id,
-      line_items: items.products.map((item: any) => {return {price_data: {currency: "eur", product_data: {name: item.name}, unit_amount: item.prize * 100}, quantity: item.amount}}),
+      line_items: items.map((item: any) => {return {price_data: {currency: "eur", product_data: {name: item.name}, unit_amount: item.prize * 100}, quantity: item.amount}}),
       success_url: process.env.PAGE_URL + "/order-completed",
       cancel_url: process.env.PAGE_URL + "/main" 
   }) 
