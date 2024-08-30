@@ -8,11 +8,30 @@ export default function receipt_template(products: Array<any>, order_code: strin
 
     products_string += "<H3>Your order summary</H3>"
 
-    products_string = "<p>order code: " + JSON.parse(order_code) + "</p> </br>"
+    products_string += "<p>order code: " + JSON.parse(order_code) + "</p> </br>"
 
-    for(var item of products){
-        products_string += "<p>product name: " + item.name + "</p> </br> <p>product price: " + item.prize + "</p> </br> <p>quantity: " + item.amount + "</p>"
-    }
+    products_string += "<table>"
+
+        products_string += "<tr> <th>Product name</th> <th>Price</th> <th>Quantity</th> </tr>"
+
+        for(var item of products){
+
+            products_string += "<tr>"
+
+                products_string += "<td> " + item.name + " </td>"
+
+                products_string += "<td> " + item.prize + " </td>"
+                
+                products_string += "<td> " + item.amount + " </td>"
+
+            //products_string += "<p>product name: " + item.name + "</p> </br> <p>product price: " + item.prize + "</p> </br> <p>quantity: " + item.amount + "</p>"
+
+            products_string += "</tr>"
+
+        }
+
+    products_string += "</table>"
+
 
     products_string += "<p>We hope you enjoyed shopping at Joynda.</p>"
     products_string += "<p>If you have any questions contact us at example@gmail.com.</p>"
