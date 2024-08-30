@@ -19,7 +19,7 @@ export default function send_receipt(email: string, products: any, order_code: s
           from: process.env.COMPANY_EMAIL,
           to: email,
           subject: 'Your receipt',
-          html : html_template
+          html: html_template
         };
         
         transporter.sendMail(mailOptions, function(error, info){
