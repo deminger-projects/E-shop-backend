@@ -98,7 +98,7 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
                 values: JSON.stringify(req.body.transformed_data.values),
                 email: JSON.stringify(req.body.transformed_data.email),
                 customer: JSON.stringify(req.body.cunstomer_data),
-                cart: items,
+                cart: JSON.stringify(items),
                 order_code: req.body.order_code,
             }
         });

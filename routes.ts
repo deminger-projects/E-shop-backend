@@ -118,7 +118,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
         customer: JSON.stringify(req.body.cunstomer_data),
 
-        cart: items,
+        cart: JSON.stringify(items),
         order_code: req.body.order_code,
       }
     }) 
