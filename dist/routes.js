@@ -323,7 +323,7 @@ exports.router.post('/get_user_refunds', validate_user_data_js_1.default, (0, tr
 exports.router.post('/get_user_acccount_data', validate_user_data_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const id = req.body.user_data.id;
-        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT users.id, users.username, users.email, users.password FROM users WHERE users.id = " + id + " ;",
+        var data = yield Promise.all([(0, write_json_js_1.default)(["SELECT users.id, users.login_status, users.username, users.email, users.password FROM users WHERE users.id = " + id + " && users.login_status = 'Active' ;",
                 "SELECT user_data.id, user_data.user_id, user_data.name, user_data.surname, user_data.phone, user_data.adress, user_data.city, user_data.postcode, user_data.status, users.email FROM user_data JOIN users ON users.id = user_data.user_id WHERE user_id = " + id + " AND status = 'Active';"])]);
         res.send(JSON.parse(data));
     });

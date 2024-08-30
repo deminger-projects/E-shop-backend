@@ -498,7 +498,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const id = req.body.user_data.id
 
-    var data: any = await Promise.all([write_json(["SELECT users.id, users.username, users.email, users.password FROM users WHERE users.id = " + id + " ;", 
+    var data: any = await Promise.all([write_json(["SELECT users.id, users.login_status, users.username, users.email, users.password FROM users WHERE users.id = " + id + " && users.login_status = 'Active' ;", 
     
     "SELECT user_data.id, user_data.user_id, user_data.name, user_data.surname, user_data.phone, user_data.adress, user_data.city, user_data.postcode, user_data.status, users.email FROM user_data JOIN users ON users.id = user_data.user_id WHERE user_id = " + id + " AND status = 'Active';"])])
 

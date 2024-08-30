@@ -20,7 +20,7 @@ export default function receipt_template(products: Array<any>, order_code: strin
 
                 products_string += "<td> " + item.name + " </td>"
 
-                products_string += "<td> " + item.prize + " </td>"
+                products_string += "<td> " + "€" + item.prize + " </td>"
                 
                 products_string += "<td> " + item.amount + " </td>"
 

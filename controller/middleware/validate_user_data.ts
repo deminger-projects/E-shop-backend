@@ -11,7 +11,7 @@ export default async function validate_user_data(req: Request, res: Response, ne
     const result = await select_request(sql, [email, password])
 
     if(result.length <= 0){
-       return next(new Error("user is not in system"))
+       return next(new Error("User is not in registered system"))
     }else{
         req.body.user_data = result[0]
     }

@@ -16,7 +16,7 @@ const select_request_1 = __importDefault(require("../../DB/select_request"));
 const register_request_validation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var email_test_result = yield (0, select_request_1.default)("SELECT * FROM users WHERE email = ? ;", [req.body.transformed_data.email]);
     if (email_test_result.length > 0) {
-        return next(new Error("email already in system"));
+        return next(new Error("Email is already registered"));
     }
     next();
 });
