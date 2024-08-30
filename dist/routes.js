@@ -92,11 +92,11 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
         items.push(delivery);
         const customer = yield stripe.customers.create({
             metadata: {
-                tables: JSON.stringify(req.body.transformed_data.tables),
-                columns: JSON.stringify(req.body.transformed_data.columns),
-                values: JSON.stringify(req.body.transformed_data.values),
-                email: JSON.stringify(req.body.transformed_data.email),
-                customer: JSON.stringify(req.body.customer_obj),
+                tables: req.body.transformed_data.tables,
+                columns: req.body.transformed_data.columns,
+                values: req.body.transformed_data.values,
+                email: req.body.transformed_data.email,
+                customer: req.body.customer_obj,
                 cart: JSON.stringify(items),
                 order_code: req.body.order_code,
             }

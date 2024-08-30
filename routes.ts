@@ -109,13 +109,13 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const customer = await stripe.customers.create({
       metadata: {
-        tables: JSON.stringify(req.body.transformed_data.tables),
-        columns: JSON.stringify(req.body.transformed_data.columns),
-        values: JSON.stringify(req.body.transformed_data.values),
+        tables: req.body.transformed_data.tables,
+        columns: req.body.transformed_data.columns,
+        values: req.body.transformed_data.values,
 
-        email: JSON.stringify(req.body.transformed_data.email),
+        email: req.body.transformed_data.email,
 
-        customer: JSON.stringify(req.body.customer_obj),
+        customer: req.body.customer_obj,
 
         cart: JSON.stringify(items),
         order_code: req.body.order_code,
