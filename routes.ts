@@ -73,22 +73,16 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var transformed_data = JSON.parse(cunstomer_data.metadata.data)
 
-    var customer_data = transformed_data.orders
+    var customer_obj = JSON.parse(cunstomer_data.metadata.customer)
+
+    var tables = transformed_data.tables
+    var columns = transformed_data.columns
+    var values = transformed_data.values
 
     var cart_data = JSON.parse(cunstomer_data.metadata.cart)
     var order_code = cunstomer_data.metadata.order_code
 
-    var customer_obj = {
-      name: customer_data.name,
-      surname: customer_data.surname,
-      email: customer_data.email,
-      phone: customer_data.phone,
-      adress: customer_data.adress,
-      city: customer_data.city,
-      postcode: customer_data.postcode
-  }
-
-    await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
+    await insert_records(tables, columns, values)
 
     send_receipt(transformed_data.email, JSON.parse(cart_data), order_code, customer_obj)
   }
@@ -97,7 +91,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 }));
 
  
-  //stripe webhook
+  //stripe webhook 
 
  
 
@@ -110,12 +104,21 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
       prize: req.body.delivery_price,
       amount: 1
     }
-  
+    //data: JSON.stringify(req.body.transformed_data),
+
     items.push(delivery)
 
     const customer = await stripe.customers.create({
       metadata: {
-        data: JSON.stringify(req.body.transformed_data),
+        tables: JSON.stringify(req.body.transformed_data.tables),
+        columns: JSON.stringify(req.body.transformed_data.columns),
+        values: JSON.stringify(req.body.transformed_data.values),
+
+        email: JSON.stringify(req.body.transformed_data.email),
+
+        customer: JSON.stringify(req.body.cunstomer_data),
+
+        cart: items,
         order_code: req.body.order_code,
       }
     }) 
