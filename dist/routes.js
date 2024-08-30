@@ -96,7 +96,7 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
                 columns: JSON.stringify(req.body.transformed_data.columns),
                 values: JSON.stringify(req.body.transformed_data.values),
                 email: JSON.stringify(req.body.transformed_data.email),
-                customer: JSON.stringify(req.body.cunstomer_data),
+                customer: JSON.stringify(req.body.customer_obj),
                 cart: JSON.stringify(items),
                 order_code: req.body.order_code,
             }
