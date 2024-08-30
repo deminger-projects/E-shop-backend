@@ -16,7 +16,7 @@ export default function modify_images(path: string, record_id: number, folder: s
         .jpeg()
         .jpeg({ quality: 100 })
         .jpeg({ progressive: true })
-        .resize(250, 250)  //full HD pixels >
+        .resize(200, 200)  
         .toFile("./public/images/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
             if (err) {
             console.error(err);

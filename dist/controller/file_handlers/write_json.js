@@ -39,7 +39,6 @@ const fs = __importStar(require("fs"));
 const select_request_js_1 = __importDefault(require("../../DB/select_request.js"));
 function write_json(sql_tasks, file) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("🚀 ~ write_json ~ sql_tasks:", sql_tasks);
         var table_names = [];
         var prom_arr = [];
         var results = yield (0, select_request_js_1.default)(sql_tasks[0]); // creates data formath with side data
