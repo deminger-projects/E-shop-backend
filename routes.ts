@@ -85,7 +85,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   res.send().end;
 }));
 
-
+ 
   //stripe webhook
 
  
@@ -107,7 +107,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     const customer = await stripe.customers.create({
       metadata: {
         data: JSON.stringify(req.body.transformed_data),
-        cart: JSON.stringify(req.body.cart),
+        cart: JSON.stringify(req.body.cart.cart_items_for_stripe_paywall),
         order_code: req.body.order_code,
         customer_obj: JSON.stringify(customer_obj)
       }

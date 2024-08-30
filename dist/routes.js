@@ -91,7 +91,7 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
         const customer = yield stripe.customers.create({
             metadata: {
                 data: JSON.stringify(req.body.transformed_data),
-                cart: JSON.stringify(req.body.cart),
+                cart: JSON.stringify(req.body.cart.cart_items_for_stripe_paywall),
                 order_code: req.body.order_code,
                 customer_obj: JSON.stringify(customer_obj)
             }
