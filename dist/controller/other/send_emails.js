@@ -31,7 +31,7 @@ function send_emails(email, code) {
     msg += "<p>Please do not answer to this email.</p>";
     msg += "<p>This email was created automatically.</p>";
     msg += "<H3>Your authentication code</H3>";
-    msg += "<p>Authentication code: " + code + "</>";
+    msg += "<p>Authentication code: " + code + "</p>";
     var transporter = nodemailer.createTransport({
         host: 'smtp.seznam.cz',
         port: 465,
@@ -44,7 +44,7 @@ function send_emails(email, code) {
     var mailOptions = {
         from: 'test2584884@seznam.cz',
         to: email,
-        subject: 'Sending Email using Node.js',
+        subject: 'Your authentication code',
         html: msg
     };
     transporter.sendMail(mailOptions, function (error, info) {

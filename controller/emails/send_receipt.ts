@@ -18,7 +18,7 @@ export default function send_receipt(email: string, products: any, order_code: s
         var mailOptions = {
           from: process.env.COMPANY_EMAIL,
           to: email,
-          subject: 'order receipt',
+          subject: 'Your receipt',
           html : html_template
         };
         

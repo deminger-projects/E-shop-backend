@@ -12,7 +12,7 @@ export default function send_emails(email: Array<string>, code: string){
 
     msg += "<H3>Your authentication code</H3>"
 
-    msg += "<p>Authentication code: " + code + "</>"
+    msg += "<p>Authentication code: " + code + "</p>"
 
     var transporter = nodemailer.createTransport({
       host: 'smtp.seznam.cz',
@@ -27,7 +27,7 @@ export default function send_emails(email: Array<string>, code: string){
       var mailOptions = {
         from: 'test2584884@seznam.cz',
         to: email,
-        subject: 'Sending Email using Node.js',
+        subject: 'Your authentication code',
         html: msg
       };
       
