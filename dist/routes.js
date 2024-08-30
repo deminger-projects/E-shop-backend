@@ -73,7 +73,7 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
             var values = JSON.parse(cunstomer_data.metadata.values);
             var email = JSON.parse(cunstomer_data.metadata.email);
             var cart_data = JSON.parse(cunstomer_data.metadata.cart);
-            var order_code = cunstomer_data.metadata.order_code;
+            var order_code = JSON.parse(cunstomer_data.metadata.order_code);
             yield (0, insert_records_js_1.default)(tables, columns, values);
             (0, send_receipt_js_1.default)(email, cart_data, order_code, customer_obj);
         }
@@ -92,10 +92,10 @@ exports.router.post('/stripe_create_session', request_data_transformer_js_1.defa
         items.push(delivery);
         const customer = yield stripe.customers.create({
             metadata: {
-                tables: req.body.transformed_data.tables,
-                columns: req.body.transformed_data.columns,
-                values: req.body.transformed_data.values,
-                email: req.body.transformed_data.email,
+                tables: JSON.stringify(req.body.transformed_data.tables),
+                columns: JSON.stringify(req.body.transformed_data.columns),
+                values: JSON.stringify(req.body.transformed_data.values),
+                email: JSON.stringify(req.body.transformed_data.email),
                 customer: req.body.customer_obj,
                 cart: JSON.stringify(items),
                 order_code: req.body.order_code,

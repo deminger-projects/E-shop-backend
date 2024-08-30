@@ -8,7 +8,7 @@ export default function receipt_template(products: Array<any>, order_code: strin
 
     products_string += "<H3>Your order summary</H3>"
 
-    products_string += "<p>order code: " + JSON.parse(order_code) + "</p> </br>"
+    products_string += "<p>order code: " + order_code + "</p> </br>"
 
     products_string += "<table>"
 
