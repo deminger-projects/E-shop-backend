@@ -26,9 +26,9 @@ export default function send_emails(email: Array<string>, code: string){
       
       var mailOptions = {
         from: 'test2584884@seznam.cz',
-        to: 'dominikjan1@gmail.com',
+        to: email,
         subject: 'Sending Email using Node.js',
-        text: msg
+        html: msg
       };
       
       transporter.sendMail(mailOptions, function(error, info){

@@ -43,9 +43,9 @@ function send_emails(email, code) {
     });
     var mailOptions = {
         from: 'test2584884@seznam.cz',
-        to: 'dominikjan1@gmail.com',
+        to: email,
         subject: 'Sending Email using Node.js',
-        text: msg
+        html: msg
     };
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
