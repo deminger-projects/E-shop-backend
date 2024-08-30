@@ -24,7 +24,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const nodemailer = __importStar(require("nodemailer"));
-function send_emails(email, msg) {
+function send_emails(email, code) {
+    var msg = "";
+    msg += "<p>Hey,</p>";
+    msg += "<p>lower you can find your authentication code.</p>";
+    msg += "<p>Please do not answer to this email.</p>";
+    msg += "<p>This email was created automatically.</p>";
+    msg += "<H3>Your authentication code</H3>";
+    msg += "<p>Authentication code: " + code + "</>";
     var transporter = nodemailer.createTransport({
         host: 'smtp.seznam.cz',
         port: 465,

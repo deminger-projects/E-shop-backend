@@ -34,7 +34,7 @@ export default function receipt_template(products: Array<any>, order_code: strin
 
     products_string += "<table>"
 
-    products_string += "<tr> <th>Name</th> <th>Surname</th> <th>Email</th> <th>Phone number</th> <th>Adress</th <th>City</th> <th>PSČ</th>></tr>"
+    products_string += "<tr> <th>Name</th> <th>Surname</th> <th>Email</th> <th>Phone number</th> <th>Adress</th <th>City</th> <th>PSČ</th> </tr>"
 
         products_string += "<tr>"
 

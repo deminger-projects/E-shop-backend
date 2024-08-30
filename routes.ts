@@ -330,7 +330,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     
     var code = Math.floor(100000 + Math.random() * 900000).toString()
 
-    send_emails([req.body.transformed_data.email], "Potvrzovací kód: " + code)
+    send_emails([req.body.transformed_data.email], code)
 
     var refund_products = await select_request("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id JOIN orders ON orders.id = order_products.order_id WHERE order_code = ?;", req.body.order_data[0].order_code)
     

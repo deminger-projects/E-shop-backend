@@ -233,7 +233,7 @@ exports.router.post('/change_record_status', request_data_transformer_js_1.defau
 exports.router.post('/refund_request', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, refund_request_validation_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         var code = Math.floor(100000 + Math.random() * 900000).toString();
-        (0, send_emails_js_1.default)([req.body.transformed_data.email], "Potvrzovací kód: " + code);
+        (0, send_emails_js_1.default)([req.body.transformed_data.email], code);
         var refund_products = yield (0, select_request_js_1.default)("SELECT products.id, products.name, order_products.size, order_products.amount, order_products.prize FROM order_products JOIN products ON products.id = order_products.product_id JOIN orders ON orders.id = order_products.order_id WHERE order_code = ?;", req.body.order_data[0].order_code);
         res.send({ msg: "order found", next_status: true, status: true, code: code, data: { orders: [req.body.order_data[0]], order_products: refund_products } });
     });

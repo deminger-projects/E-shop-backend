@@ -1,6 +1,18 @@
 import * as nodemailer from "nodemailer"
 
-export default function send_emails(email: Array<string>, msg: string){
+export default function send_emails(email: Array<string>, code: string){
+
+    var msg = ""
+
+    msg += "<p>Hey,</p>"
+    msg += "<p>lower you can find your authentication code.</p>"
+
+    msg += "<p>Please do not answer to this email.</p>"
+    msg += "<p>This email was created automatically.</p>"
+
+    msg += "<H3>Your authentication code</H3>"
+
+    msg += "<p>Authentication code: " + code + "</>"
 
     var transporter = nodemailer.createTransport({
       host: 'smtp.seznam.cz',
