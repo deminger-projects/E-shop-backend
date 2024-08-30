@@ -67,15 +67,15 @@ exports.router.post('/webhook', express.raw({ type: 'application/json' }), (0, t
         // Handle the event
         if (event_type === "checkout.session.completed") {
             var cunstomer_data = yield stripe.customers.retrieve(data.customer);
-            var transformed_data = JSON.parse(cunstomer_data.metadata.data);
             var customer_obj = JSON.parse(cunstomer_data.metadata.customer);
-            var tables = transformed_data.tables;
-            var columns = transformed_data.columns;
-            var values = transformed_data.values;
+            var tables = JSON.parse(cunstomer_data.metadata.tables);
+            var columns = JSON.parse(cunstomer_data.metadata.columns);
+            var values = JSON.parse(cunstomer_data.metadata.values);
+            var email = JSON.parse(cunstomer_data.metadata.email);
             var cart_data = JSON.parse(cunstomer_data.metadata.cart);
             var order_code = cunstomer_data.metadata.order_code;
             yield (0, insert_records_js_1.default)(tables, columns, values);
-            (0, send_receipt_js_1.default)(transformed_data.email, JSON.parse(cart_data), order_code, customer_obj);
+            (0, send_receipt_js_1.default)(email, JSON.parse(cart_data), order_code, customer_obj);
         }
         res.send().end;
     });

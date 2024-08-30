@@ -71,20 +71,20 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   if(event_type === "checkout.session.completed"){
     var cunstomer_data = await stripe.customers.retrieve(data.customer)
 
-    var transformed_data = JSON.parse(cunstomer_data.metadata.data)
-
     var customer_obj = JSON.parse(cunstomer_data.metadata.customer)
 
-    var tables = transformed_data.tables
-    var columns = transformed_data.columns
-    var values = transformed_data.values
+    var tables = JSON.parse(cunstomer_data.metadata.tables)
+    var columns = JSON.parse(cunstomer_data.metadata.columns)
+    var values = JSON.parse(cunstomer_data.metadata.values)
+
+    var email = JSON.parse(cunstomer_data.metadata.email)
 
     var cart_data = JSON.parse(cunstomer_data.metadata.cart)
     var order_code = cunstomer_data.metadata.order_code
 
     await insert_records(tables, columns, values)
 
-    send_receipt(transformed_data.email, JSON.parse(cart_data), order_code, customer_obj)
+    send_receipt(email, JSON.parse(cart_data), order_code, customer_obj)
   }
   
   res.send().end;
