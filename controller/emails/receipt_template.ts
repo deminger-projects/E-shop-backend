@@ -1,7 +1,7 @@
 export default function receipt_template(products: Array<any>, order_code: string, customer_obj: any){
 
     var products_string = ""
-
+ 
     products_string += "<p>Hey,</p>"
     products_string += "<p>thanks for your order. We are very happy to see new customers.</p>"
     products_string += "<p>Your order will come within 30, but most orders are delivered in 10 days.</p>"
