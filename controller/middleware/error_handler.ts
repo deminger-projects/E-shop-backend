@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 
 export default function error_handler(error: Error, req: Request, res: Response, next: NextFunction){
 
+    console.log("Error: ")
+
     console.log(error.message)
 
     console.log(error)
