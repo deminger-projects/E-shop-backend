@@ -43,6 +43,12 @@ const fs = __importStar(require("fs"));
 function save_files(path, files) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
+        if (!fs.existsSync("./public/")) {
+            fs.mkdirSync("./public/");
+        }
+        if (!fs.existsSync("./public/images/")) {
+            fs.mkdirSync("./public/images/");
+        }
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
         }
