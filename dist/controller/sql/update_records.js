@@ -34,11 +34,12 @@ function update_records(tables, columns, values, record_id, file_names_to_keep) 
             else {
                 var sql = "DELETE FROM " + tables[table_index] + " WHERE " + columns[table_index][0] + " = ?;";
                 yield (0, delete_request_1.default)(sql, [record_id.toString()]);
-                if (file_names_to_keep && tables[table_index].includes("image")) {
-                    for (let index = 0; index < file_names_to_keep.length; index++) {
-                        values[table_index].push([record_id.toString(), file_names_to_keep[index]]);
-                    }
-                }
+                // vkladalo dvakrat data
+                // if(file_names_to_keep && tables[table_index].includes("image")){     
+                //     for (let index = 0; index < file_names_to_keep.length; index++) {
+                //         values[table_index].push([record_id.toString(), file_names_to_keep[index]])
+                //     }
+                // }
                 yield (0, insert_records_1.default)([tables[table_index]], [columns[table_index]], [values[table_index]]);
             }
         }

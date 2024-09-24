@@ -54,6 +54,8 @@ function update_files(file_names_to_keep, folder, record_id, files) {
                 files_to_delete.push(saved_file_name);
             }
         }
+        console.log("🚀 ~ update_files ~ files_to_delete:", files_to_delete);
+        console.log("🚀 ~ update_files ~ files:", files);
         for (var file_name of files_to_delete) {
             fs.unlinkSync(path + "/" + file_name);
         }

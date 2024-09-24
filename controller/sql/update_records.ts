@@ -25,11 +25,12 @@ export default async function update_records(tables: Array<string>, columns: Arr
 
             await delete_request(sql, [record_id.toString()])
 
-            if(file_names_to_keep && tables[table_index].includes("image")){
-                for (let index = 0; index < file_names_to_keep.length; index++) {
-                    values[table_index].push([record_id.toString(), file_names_to_keep[index]])
-                }
-            }
+                                                                                    // vkladalo dvakrat data
+            // if(file_names_to_keep && tables[table_index].includes("image")){     
+            //     for (let index = 0; index < file_names_to_keep.length; index++) {
+            //         values[table_index].push([record_id.toString(), file_names_to_keep[index]])
+            //     }
+            // }
 
             await insert_records([tables[table_index]], [columns[table_index]], [values[table_index]])
         }
