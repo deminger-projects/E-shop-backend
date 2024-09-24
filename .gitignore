@@ -5,6 +5,8 @@
 process.env
 .process.env
 
+public/
+
 ### Node ###
 # Logs
 logs
