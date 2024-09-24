@@ -4,16 +4,8 @@
 #my shit
 process.env
 .process.env
+.env
 
-public/
-
-images/
-
-public\images
-
-public\images/
-
-collections/
 
 ### Node ###
 # Logs

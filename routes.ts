@@ -27,10 +27,9 @@ import send_receipt from "./controller/emails/send_receipt.js";
 
 const bcrypt = require('bcrypt');
 
-//const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
-const stripe = require("stripe")('sk_test_51OHsB9C2agLPKl6uq4bSJh45m0Jl4tVzcdIFxiednewjV17crrnvGYoslGSfS4dBwH1OjNJpc3I3TS6ZCboS5tiN00xHXbm7Oy')
+const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 var endpointSecret: any = undefined
-//const endpointSecret = "whsec_b6e67eada329714ee59ea0f0cea0617712dc177e12091c01d5f83e5196c52d49"; // local test
+
 
 const express = require('express');
 
