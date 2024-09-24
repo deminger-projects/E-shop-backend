@@ -5,7 +5,15 @@
 process.env
 .process.env
 
+public/
+
 images/
+
+public\images
+
+public\images/
+
+collections/
 
 ### Node ###
 # Logs
