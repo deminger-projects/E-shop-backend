@@ -5,7 +5,7 @@
 process.env
 .process.env
 
-public/images/collections/
+images/
 
 ### Node ###
 # Logs
