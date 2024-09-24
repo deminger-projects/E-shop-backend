@@ -15,6 +15,8 @@ export default async function save_files(path: string, files: FileArray){
       fs.mkdirSync(path)
     }
       
+    console.log("🚀 ~ save_files ~ path:", path)
+
     var prom = []
 
     var multiple_files = files.multiple_files as UploadedFile[]
