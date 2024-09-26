@@ -13,6 +13,9 @@ export default function modify_images(path: string, record_id: number, folder: s
     //     fs.mkdirSync("./public/images/" + folder + "/" + record_id)
     // }
 
+
+
+
     // if(!fs.existsSync("./image_storage/" + folder + "/")){
     //     fs.mkdirSync("./image_storage/" + folder + "/")
     // }
@@ -31,7 +34,7 @@ export default function modify_images(path: string, record_id: number, folder: s
         .resize(200, 200)  
         //.toFile("./public/images/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
         // .toFile("./image_storage/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
-        .toFile("./image_storage/" + file, (err: Error, info: any) => {
+        .toFile("./image_storag/" + file, (err: Error, info: any) => {
             if (err) {
             console.error(err);
             }else{
