@@ -16,29 +16,30 @@ export default function modify_images(path: string, record_id: number, folder: s
 
 
 
-    // if(!fs.existsSync("./image_storage/" + folder + "/")){
-    //     fs.mkdirSync("./image_storage/" + folder + "/")
-    // }
+    if(!fs.existsSync("/image_storage/" + folder + "/")){
+        fs.mkdirSync("/image_storage/" + folder + "/")
+    }
 
-    // if(!fs.existsSync("./image_storage/" + folder + "/" + record_id)){
-    //     fs.mkdirSync("./image_storage/" + folder + "/" + record_id)
-    // }
+    if(!fs.existsSync("/image_storage/" + folder + "/" + record_id)){
+        fs.mkdirSync("/image_storage/" + folder + "/" + record_id)
+    }
 
     sharp.cache(false);
 
     for(let file of files){
-        sharp(path + file)
+        //sharp(path + file)
+        sharp("/image_storage/" + folder + "/" + record_id + "/" + file)
         .jpeg()
         .jpeg({ quality: 100 })
         .jpeg({ progressive: true })
         .resize(200, 200)  
         //.toFile("./public/images/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
         // .toFile("./image_storage/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
-        .toFile("./image_storag/" + file, (err: Error, info: any) => {
+        .toFile("/image_storage/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
             if (err) {
             console.error(err);
             }else{
-                fs.unlinkSync(path + file)
+                fs.unlinkSync("/image_storage/" + folder + "/" + record_id + "/" + file)
             }
         }) 
     }
