@@ -25,7 +25,9 @@ export default async function save_files(path: string, files: FileArray){
       
     //fs.mkdirSync("./image_storage/" + "test/")
 
+  if(!fs.existsSync("/image_storage/test/")){
     fs.mkdirSync("/image_storage/test/")
+  }
 
     var prom = []
 
