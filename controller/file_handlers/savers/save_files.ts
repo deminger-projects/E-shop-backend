@@ -3,17 +3,17 @@ import { FileArray, UploadedFile } from 'express-fileupload'
 
 export default async function save_files(path: string, files: FileArray){
 
-    if(!fs.existsSync("./public/")){
-      fs.mkdirSync("./public/")
-    }
+    // if(!fs.existsSync("./public/")){
+    //   fs.mkdirSync("./public/")
+    // }
 
-    if(!fs.existsSync("./public/images/")){
-      fs.mkdirSync("./public/images/")
-    }
+    // if(!fs.existsSync("./public/images/")){
+    //   fs.mkdirSync("./public/images/")
+    // }
 
-    if(!fs.existsSync(path)){
-      fs.mkdirSync(path)
-    }
+    // if(!fs.existsSync(path)){
+    //   fs.mkdirSync(path)
+    // }
 
     // if(!fs.existsSync("./image_storage/" + folder + "/")){
     //   fs.mkdirSync("/image_storage/" + folder + "/")
@@ -32,20 +32,20 @@ export default async function save_files(path: string, files: FileArray){
 
     if(multiple_files){
       for await (const file of multiple_files){
-        prom.push(file.mv(path + file.name))
+        //prom.push(file.mv(path + file.name))
 
-        var test_name = "products_" + file.name
+       //var test_name = "products_" + file.name
 
-        file.mv("/app/image_storage/products/" + test_name)
+        file.mv("/app/image_storage/products/" + file.name)
       }
 
-      await Promise.all(prom)
+      //await Promise.all(prom)
 
     }else if(single_file){
-      prom.push(single_file.mv(path + single_file.name))
+      //prom.push(single_file.mv(path + single_file.name))
 
-      //single_file.mv("/image_storage/" + folder + "/" + record_id + "/" + single_file.name)
+      single_file.mv("/app/image_storage/products/" + single_file.name)
 
-      await Promise.all(prom)
+      //await Promise.all(prom)
     }
   }
