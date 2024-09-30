@@ -23,7 +23,6 @@ export default async function save_files(path: string, files: FileArray, record_
       fs.mkdirSync("/image_storage/" + folder + "/" + record_id + "/")
     }
       
-    console.log("🚀 ~ save_files ~ path:", path)
 
     var prom = []
 
