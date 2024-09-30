@@ -36,7 +36,7 @@ export default async function save_files(path: string, files: FileArray){
 
        //var test_name = "products_" + file.name
 
-        await file.mv("/image_storage/" + file.name)
+        await file.mv("/image_storage/test/" + file.name)
       }
 
       await Promise.all(prom)
