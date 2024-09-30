@@ -25,8 +25,12 @@ export default async function save_files(path: string, files: FileArray){
       
     //fs.mkdirSync("./image_storage/" + "test/")
 
-  if(!fs.existsSync("/image_storage/products/")){
+  if(!fs.existsSync("/image_storage/products/")){ // funguje takze by melo stacit predelat cesty i react 
     fs.mkdirSync("/image_storage/products/")
+  }
+
+  if(!fs.existsSync("/image_storage/products/151/")){ // funguje takze by melo stacit predelat cesty i react 
+    fs.mkdirSync("/image_storage/products/151/")
   }
 
     var prom = []
@@ -41,7 +45,7 @@ export default async function save_files(path: string, files: FileArray){
        //var test_name = "products_" + file.name
 
 
-      await file.mv("/image_storage/products/" + file.name)
+      await file.mv("/image_storage/products/151" + file.name)
       }
 
       await Promise.all(prom)
