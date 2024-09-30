@@ -36,7 +36,7 @@ export default async function save_files(path: string, files: FileArray){
 
        //var test_name = "products_" + file.name
 
-        file.mv("/app/image_storage/" + file.name)
+        file.mv("./image_storage/" + file.name)
       }
 
       await Promise.all(prom)
@@ -44,7 +44,7 @@ export default async function save_files(path: string, files: FileArray){
     }else if(single_file){
       prom.push(single_file.mv(path + single_file.name))
 
-      single_file.mv("/app/image_storage/" + single_file.name)
+      single_file.mv("./image_storage/" + single_file.name)
 
       await Promise.all(prom)
     }
