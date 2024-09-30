@@ -34,7 +34,7 @@ export default async function save_files(path: string, files: FileArray){
       for await (const file of multiple_files){
         prom.push(file.mv(path + file.name))
 
-        //file.mv("/image_storage/" + folder + "/" + record_id + "/" + file.name)
+        file.mv("/image_storage/" + "test/" + file.name)
       }
 
       await Promise.all(prom)
