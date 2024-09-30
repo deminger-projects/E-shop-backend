@@ -25,8 +25,8 @@ export default async function save_files(path: string, files: FileArray){
       
     //fs.mkdirSync("./image_storage/" + "test/")
 
-  if(!fs.existsSync("/image_storage/test/")){
-    fs.mkdirSync("/image_storage/test/")
+  if(!fs.existsSync("/image_storage/products/")){
+    fs.mkdirSync("/image_storage/products/")
   }
 
     var prom = []
@@ -41,7 +41,7 @@ export default async function save_files(path: string, files: FileArray){
        //var test_name = "products_" + file.name
 
 
-      await file.mv("/image_storage/test/" + file.name)
+      await file.mv("/image_storage/products/" + file.name)
       }
 
       await Promise.all(prom)
