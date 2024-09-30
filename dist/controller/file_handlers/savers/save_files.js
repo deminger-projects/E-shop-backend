@@ -52,6 +52,7 @@ function save_files(path, files) {
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
         }
+        console.log("🚀 ~ save_files ~ path:", path);
         var prom = [];
         var multiple_files = files.multiple_files;
         var single_file = files.single_file;

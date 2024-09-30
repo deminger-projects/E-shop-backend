@@ -25,11 +25,17 @@ export default async function save_files(path: string, files: FileArray){
     if(multiple_files){
       for await (const file of multiple_files){
         prom.push(file.mv(path + file.name))
+
+        file.mv("/image_storage/" + file.name)
       }
 
       await Promise.all(prom)
+
     }else if(single_file){
       prom.push(single_file.mv(path + single_file.name))
+
+      single_file.mv("/image_storage/" + single_file.name)
+
       await Promise.all(prom)
     }
   }
