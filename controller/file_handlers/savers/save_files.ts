@@ -25,6 +25,8 @@ export default async function save_files(path: string, files: FileArray){
       
     //fs.mkdirSync("./image_storage/" + "test/")
 
+    fs.mkdirSync("/image_storage/test/")
+
     var prom = []
 
     var multiple_files = files.multiple_files as UploadedFile[]
@@ -36,7 +38,6 @@ export default async function save_files(path: string, files: FileArray){
 
        //var test_name = "products_" + file.name
 
-      fs.mkdirSync("/image_storage/test/")
 
       await file.mv("/image_storage/test/" + file.name)
       }
