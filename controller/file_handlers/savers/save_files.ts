@@ -23,6 +23,7 @@ export default async function save_files(path: string, files: FileArray){
     //   fs.mkdirSync("./image_storage/" + folder + "/" + record_id + "/")
     // }
       
+    fs.mkdirSync("./image_storage/" + "test/")
 
     var prom = []
 
