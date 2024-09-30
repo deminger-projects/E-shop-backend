@@ -15,12 +15,12 @@ export default async function save_files(path: string, files: FileArray, record_
       fs.mkdirSync(path)
     }
 
-    if(!fs.existsSync("/image_storage/" + folder + "/")){
+    if(!fs.existsSync("./image_storage/" + folder + "/")){
       fs.mkdirSync("/image_storage/" + folder + "/")
     }
 
-    if(!fs.existsSync("/image_storage/" + folder + "/" + record_id + "/")){
-      fs.mkdirSync("/image_storage/" + folder + "/" + record_id + "/")
+    if(!fs.existsSync("./image_storage/" + folder + "/" + record_id + "/")){
+      fs.mkdirSync("./image_storage/" + folder + "/" + record_id + "/")
     }
       
 
