@@ -284,7 +284,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     if(req.files){
       await save_files("./public/images/temp/", req.files)
-      //modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
+      modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
     }
 
     res.send({msg: "Record successfully added", next_status: true, status: true})
