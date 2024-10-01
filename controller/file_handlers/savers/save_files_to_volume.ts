@@ -4,12 +4,14 @@ import sharp from "sharp";
 
 export default async function save_files_to_volume(files: FileArray, folder: string, record_id: number){
 
-    if(!fs.existsSync("/image_storage/" + folder + "/")){ // funguje takze by melo stacit predelat cesty i react 
-        fs.mkdirSync("/image_storage/" + folder + "/")
+    var storage_name = "/test/"
+
+    if(!fs.existsSync(storage_name + folder + "/")){ // funguje takze by melo stacit predelat cesty i react 
+        fs.mkdirSync(storage_name + folder + "/")
     }
     
-    if(!fs.existsSync("/image_storage/" + folder + "/" + record_id + "/")){
-        fs.mkdirSync("/image_storage/" + folder + "/" + record_id + "/")
+    if(!fs.existsSync(storage_name + folder + "/" + record_id + "/")){
+        fs.mkdirSync(storage_name + folder + "/" + record_id + "/")
     }   
 
     var multiple_files = files.multiple_files as UploadedFile[]
@@ -19,17 +21,16 @@ export default async function save_files_to_volume(files: FileArray, folder: str
 
     if(multiple_files){
         for(var file of multiple_files){
-            await file.mv("/image_storage/" + folder + "/" + record_id + "/" + file.name)
+            await file.mv(storage_name + folder + "/" + record_id + "/" + file.name)
         }
     }
 
     if(single_file){
-        await single_file.mv("/image_storage/" + folder + "/" + record_id + "/" + single_file.name)
+        await single_file.mv(storage_name + folder + "/" + record_id + "/" + single_file.name)
     }
 
 
-    
-    fs.readdir("/image_storage/" + folder + "/" + record_id + "/", ((err) => {
+    fs.readdir(storage_name + folder + "/" + record_id + "/", ((err) => {
         if(err){
             console.log(err)
         }
