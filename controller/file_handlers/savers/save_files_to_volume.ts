@@ -8,14 +8,14 @@ export default async function save_files_to_volume(files: FileArray, folder: str
         fs.mkdirSync("/image_storage/" + folder + "/")
     }
     
-    if(!fs.existsSync("/image_storage/" + folder + "/" + record_id + "/")){ // funguje takze by melo stacit predelat cesty i react 
+    if(!fs.existsSync("/image_storage/" + folder + "/" + record_id + "/")){
         fs.mkdirSync("/image_storage/" + folder + "/" + record_id + "/")
     }   
 
     var multiple_files = files.multiple_files as UploadedFile[]
     var single_file = files.single_file as UploadedFile
 
-    sharp.cache(false);
+    //sharp.cache(false);
 
     if(multiple_files){
         for(var file of multiple_files){
