@@ -1,7 +1,10 @@
 import * as fs from "fs"
 import { FileArray, UploadedFile } from 'express-fileupload'
 
-export default async function save_files(path: string, files: FileArray, folder: string, redord_id: number){
+export default async function save_files(path: string, files: FileArray){
+
+    var folder = "products"
+    var redord_id = 151
 
     if(!fs.existsSync("./public/")){
       fs.mkdirSync("./public/")

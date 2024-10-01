@@ -283,7 +283,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     var record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
     if(req.files){
-      await save_files("./public/images/temp/", req.files, JSON.parse(req.body.folder), record_id)
+      await save_files("./public/images/temp/", req.files)
       modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
     }
 
