@@ -23,7 +23,6 @@ const update_records_js_1 = __importDefault(require("./controller/sql/update_rec
 const login_request_validation_js_1 = __importDefault(require("./controller/middleware/login_request_validation.js"));
 const register_request_validation_js_1 = __importDefault(require("./controller/middleware/register_request_validation.js"));
 const update_files_js_1 = __importDefault(require("./controller/file_handlers/updates/update_files.js"));
-const save_files_js_1 = __importDefault(require("./controller/file_handlers/savers/save_files.js"));
 const send_emails_js_1 = __importDefault(require("./controller/other/send_emails.js"));
 const select_request_js_1 = __importDefault(require("./DB/select_request.js"));
 const refund_request_validation_js_1 = __importDefault(require("./controller/middleware/refund_request_validation.js"));
@@ -31,6 +30,7 @@ const write_json_js_1 = __importDefault(require("./controller/file_handlers/writ
 const modify_images_js_1 = __importDefault(require("./controller/file_handlers/modify_images.js"));
 const validate_user_data_js_1 = __importDefault(require("./controller/middleware/validate_user_data.js"));
 const send_receipt_js_1 = __importDefault(require("./controller/emails/send_receipt.js"));
+const save_files_to_volume_js_1 = __importDefault(require("./controller/file_handlers/savers/save_files_to_volume.js"));
 const bcrypt = require('bcrypt');
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 var endpointSecret = undefined;
@@ -197,9 +197,11 @@ exports.router.post('/add_record', request_data_transformer_js_1.default, check_
     return __awaiter(this, void 0, void 0, function* () {
         const transformed_data = req.body.transformed_data;
         var record_id = yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
+        var folder = JSON.parse(req.body.folder);
         if (req.files) {
-            yield (0, save_files_js_1.default)("./public/images/temp/", req.files);
-            (0, modify_images_js_1.default)("./public/images/temp/", record_id, JSON.parse(req.body.folder));
+            yield (0, save_files_to_volume_js_1.default)(req.files, folder, record_id);
+            //await save_files("./public/images/temp/", req.files)
+            //modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
         }
         res.send({ msg: "Record successfully added", next_status: true, status: true });
     });

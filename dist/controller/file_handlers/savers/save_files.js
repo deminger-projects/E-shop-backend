@@ -43,6 +43,8 @@ const fs = __importStar(require("fs"));
 function save_files(path, files) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
+        var folder = "products";
+        var redord_id = 151;
         if (!fs.existsSync("./public/")) {
             fs.mkdirSync("./public/");
         }
@@ -52,7 +54,19 @@ function save_files(path, files) {
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
         }
-        console.log("🚀 ~ save_files ~ path:", path);
+        // if(!fs.existsSync("./image_storage/" + folder + "/")){
+        //   fs.mkdirSync("/image_storage/" + folder + "/")
+        // }
+        // if(!fs.existsSync("./image_storage/" + folder + "/" + record_id + "/")){
+        //   fs.mkdirSync("./image_storage/" + folder + "/" + record_id + "/")
+        // }
+        //fs.mkdirSync("./image_storage/" + "test/")
+        if (!fs.existsSync("/image_storage/" + folder + "/")) { // funguje takze by melo stacit predelat cesty i react 
+            fs.mkdirSync("/image_storage/" + folder + "/");
+        }
+        if (!fs.existsSync("/image_storage/" + folder + "/" + redord_id + "/")) { // funguje takze by melo stacit predelat cesty i react 
+            fs.mkdirSync("/image_storage/" + folder + "/" + redord_id + "/");
+        }
         var prom = [];
         var multiple_files = files.multiple_files;
         var single_file = files.single_file;
@@ -63,6 +77,8 @@ function save_files(path, files) {
                     _d = false;
                     const file = _c;
                     prom.push(file.mv(path + file.name));
+                    //var test_name = "products_" + file.name
+                    yield file.mv("/image_storage/" + folder + "/" + redord_id + "/" + file.name);
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -76,6 +92,7 @@ function save_files(path, files) {
         }
         else if (single_file) {
             prom.push(single_file.mv(path + single_file.name));
+            //single_file.mv("/image_storage/" + single_file.name)
             yield Promise.all(prom);
         }
     });
