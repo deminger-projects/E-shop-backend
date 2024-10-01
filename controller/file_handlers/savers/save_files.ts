@@ -1,7 +1,7 @@
 import * as fs from "fs"
 import { FileArray, UploadedFile } from 'express-fileupload'
 
-export default async function save_files(path: string, files: FileArray){
+export default async function save_files(path: string, files: FileArray, folder: string, redord_id: number){
 
     if(!fs.existsSync("./public/")){
       fs.mkdirSync("./public/")
@@ -25,12 +25,12 @@ export default async function save_files(path: string, files: FileArray){
       
     //fs.mkdirSync("./image_storage/" + "test/")
 
-  if(!fs.existsSync("/image_storage/products/")){ // funguje takze by melo stacit predelat cesty i react 
-    fs.mkdirSync("/image_storage/products/")
+  if(!fs.existsSync("/image_storage/" + folder + "/")){ // funguje takze by melo stacit predelat cesty i react 
+    fs.mkdirSync("/image_storage/" + folder + "/")
   }
 
-  if(!fs.existsSync("/image_storage/products/151/")){ // funguje takze by melo stacit predelat cesty i react 
-    fs.mkdirSync("/image_storage/products/151/")
+  if(!fs.existsSync("/image_storage/" + folder + "/" + redord_id + "/")){ // funguje takze by melo stacit predelat cesty i react 
+    fs.mkdirSync("/image_storage/" + folder + "/" + redord_id + "/")
   }
 
     var prom = []
@@ -45,7 +45,7 @@ export default async function save_files(path: string, files: FileArray){
        //var test_name = "products_" + file.name
 
 
-      await file.mv("/image_storage/products/151" + file.name)
+      await file.mv("/image_storage/" + folder + "/" + redord_id + "/" + file.name)
       }
 
       await Promise.all(prom)
