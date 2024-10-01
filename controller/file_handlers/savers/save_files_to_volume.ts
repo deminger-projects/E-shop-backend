@@ -6,42 +6,42 @@ export default async function save_files_to_volume(files: FileArray, folder: str
 
     var storage_name = "/test/"
 
-    // if(!fs.existsSync(storage_name + folder + "/")){ // funguje takze by melo stacit predelat cesty i react 
-    //     fs.mkdirSync(storage_name + folder + "/")
-    // }
+    if(!fs.existsSync(storage_name + folder + "/")){ // funguje takze by melo stacit predelat cesty i react 
+        fs.mkdirSync(storage_name + folder + "/")
+    }
     
-    // if(!fs.existsSync(storage_name + folder + "/" + record_id + "/")){
-    //     fs.mkdirSync(storage_name + folder + "/" + record_id + "/")
-    // }   
+    if(!fs.existsSync(storage_name + folder + "/" + record_id + "/")){
+        fs.mkdirSync(storage_name + folder + "/" + record_id + "/")
+    }   
 
     
-
-    // //sharp.cache(false);
-
-    // if(multiple_files){
-    //     for(var file of multiple_files){
-    //         await file.mv(storage_name + folder + "/" + record_id + "/" + file.name)
-    //     }
-    // }
-
-    // if(single_file){
-    //     await single_file.mv(storage_name + folder + "/" + record_id + "/" + single_file.name)
-    // }
-
-
     var multiple_files = files.multiple_files as UploadedFile[]
     var single_file = files.single_file as UploadedFile
 
 
+    //sharp.cache(false);
+
     if(multiple_files){
         for(var file of multiple_files){
-            await file.mv(storage_name + "/" + file.name)
+            await file.mv(storage_name + folder + "/" + record_id + "/" + file.name)
         }
     }
 
     if(single_file){
-        await single_file.mv(storage_name + "/" + single_file.name)
+        await single_file.mv(storage_name + folder + "/" + record_id + "/" + single_file.name)
     }
+
+
+
+    // if(multiple_files){
+    //     for(var file of multiple_files){
+    //         await file.mv(storage_name + "/" + file.name)
+    //     }
+    // }
+
+    // if(single_file){
+    //     await single_file.mv(storage_name + "/" + single_file.name)
+    // }
 
 
 
