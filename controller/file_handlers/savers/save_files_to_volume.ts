@@ -27,6 +27,15 @@ export default async function save_files_to_volume(files: FileArray, folder: str
         await single_file.mv("/image_storage/" + folder + "/" + record_id + "/" + single_file.name)
     }
 
+
+    
+    fs.readdir("/image_storage/" + folder + "/" + record_id + "/", ((err) => {
+        if(err){
+            console.log(err)
+        }
+    }))
+
+
     // if(multiple_files){
     //     for(let file of multiple_files){
     //         //sharp(path + file)
