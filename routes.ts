@@ -23,6 +23,7 @@ import write_json from "./controller/file_handlers/write_json.js";
 import modify_images from "./controller/file_handlers/modify_images.js";
 import validate_user_data from "./controller/middleware/validate_user_data.js";
 import send_receipt from "./controller/emails/send_receipt.js";
+import save_files_to_volume from "./controller/file_handlers/savers/save_files_to_volume.js";
 
 
 const bcrypt = require('bcrypt');
@@ -282,7 +283,10 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
+    var folder = JSON.parse(req.body.folder)
+
     if(req.files){
+      await save_files_to_volume(req.files, folder, record_id)
       //await save_files("./public/images/temp/", req.files)
       //modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
     }
