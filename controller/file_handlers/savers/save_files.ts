@@ -25,9 +25,9 @@ export default async function save_files(path: string, files: FileArray, folder:
       
     //fs.mkdirSync("./image_storage/" + "test/")
 
-  if(!fs.existsSync("/image_storage/" + folder + "/")){ // funguje takze by melo stacit predelat cesty i react 
-    fs.mkdirSync("/image_storage/" + folder + "/")
-  }
+  // if(!fs.existsSync("/image_storage/" + folder + "/")){ // funguje takze by melo stacit predelat cesty i react 
+  //   fs.mkdirSync("/image_storage/" + folder + "/")
+  // }
 
   if(!fs.existsSync("/image_storage/" + folder + "/" + redord_id + "/")){ // funguje takze by melo stacit predelat cesty i react 
     fs.mkdirSync("/image_storage/" + folder + "/" + redord_id + "/")
