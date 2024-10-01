@@ -4,7 +4,7 @@ import sharp from "sharp";
 
 export default async function save_files_to_volume(files: FileArray, folder: string, record_id: number){
 
-    var storage_name = "/app/image_storage/"
+    var storage_name = "/image_storage/"
 
     if(!fs.existsSync(storage_name + folder + "/")){ // funguje takze by melo stacit predelat cesty i react 
         fs.mkdirSync(storage_name + folder + "/")
