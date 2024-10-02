@@ -24,6 +24,7 @@ import modify_images from "./controller/file_handlers/modify_images.js";
 import validate_user_data from "./controller/middleware/validate_user_data.js";
 import send_receipt from "./controller/emails/send_receipt.js";
 import save_files_to_volume from "./controller/file_handlers/savers/save_files_to_volume.js";
+import update_files_in_volume from "./controller/file_handlers/updates/update_files_in_volume.js";
 
 
 const bcrypt = require('bcrypt');
@@ -285,8 +286,6 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var folder = JSON.parse(req.body.folder)
 
-    console.log("test for railway")
-
     if(req.files){
       await save_files_to_volume(req.files, folder, record_id)
       //await save_files("./public/images/temp/", req.files)
@@ -301,6 +300,10 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     const transformed_data = req.body.transformed_data
 
+    var folder = JSON.parse(req.body.folder)
+    var record_id = JSON.parse(req.body.record_id)
+    var file_names_to_keep = JSON.parse(req.body.files_names_to_keep)
+
     if(req.body.files_names_to_keep){
       await update_records(transformed_data.tables, transformed_data.columns, transformed_data.values, JSON.parse(req.body.record_id), JSON.parse(req.body.files_names_to_keep))
     }else{
@@ -308,8 +311,9 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
     }
   
     if(req.files){
-      await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id), req.files)
-      modify_images("./public/images/temp/", JSON.parse(req.body.record_id), JSON.parse(req.body.folder))
+      await update_files_in_volume(folder, record_id, file_names_to_keep, req.files)
+      //await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id), req.files)
+      //modify_images("./public/images/temp/", JSON.parse(req.body.record_id), JSON.parse(req.body.folder))
     }else if(req.body.files_names_to_keep){
       await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id))
     }
