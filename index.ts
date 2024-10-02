@@ -16,8 +16,6 @@ app.use(fileUpload())   //file support
 
 app.use(express.static('./public')) //udeluje pristup k server public dir
 
-//app.use(express.static('./image_storage')) //udeluje pristup k server public dir
-
 app.use(express.static('/image_storage')) //udeluje pristup k server public dir
 
 
