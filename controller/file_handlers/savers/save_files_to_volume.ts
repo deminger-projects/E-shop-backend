@@ -46,6 +46,8 @@ export default async function save_files_to_volume(files: FileArray, folder: str
                 if (err) {
                 console.error(err);
                 }else{
+                    console.log("save succesfull")
+
                     fs.unlinkSync("/image_storage/" + folder + "/" + record_id + "/" + file)
                 }
             }) 
@@ -64,6 +66,8 @@ export default async function save_files_to_volume(files: FileArray, folder: str
             if (err) {
             console.error(err);
             }else{
+                console.log("save succesfull")
+
                 fs.unlinkSync("/image_storage/" + folder + "/" + record_id + "/" + single_file)
             }
         }) 
