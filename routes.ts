@@ -665,6 +665,20 @@ router.post('/get_collection_by_id', try_catch(async function (req: Request, res
   }))
 
 
+
+  // router.post('/volime_images_test', try_catch(async function (req: Request, res: Response) {   
+
+  //   var id = Number((await select_request("SELECT id FROM users WHERE email = ? AND password = ? ;", [JSON.parse(req.body.email), JSON.parse(req.body.password)]))[0].id)
+
+  //   if(id === Number(process.env.ADMIN_ID)){
+  //     res.send({msg: "user is admin", next_status: true})
+  //   }else{
+  //     res.send({msg: "user is not a admin", next_status: false})
+  //   }
+
+  // }))
+
+
  
 
 
