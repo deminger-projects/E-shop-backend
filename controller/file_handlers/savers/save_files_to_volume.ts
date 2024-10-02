@@ -44,7 +44,7 @@ export default async function save_files_to_volume(files: FileArray, folder: str
 
 
     for(let file of files_in_folder){
-        sharp("/image_storage/" + folder + "/" + record_id + "/" + file)
+        sharp(storage_name + folder + "/temp/" + file)
         .jpeg()
         .jpeg({ quality: 80 })
         .jpeg({ progressive: true })
