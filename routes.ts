@@ -315,7 +315,8 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
       //await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id), req.files)
       //modify_images("./public/images/temp/", JSON.parse(req.body.record_id), JSON.parse(req.body.folder))
     }else if(req.body.files_names_to_keep){
-      await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id))
+      await update_files_in_volume(folder, record_id, file_names_to_keep)
+      //await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id))
     }
 
     if(req.body.psw_change){
