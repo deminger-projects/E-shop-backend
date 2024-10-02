@@ -22,15 +22,14 @@ const insert_records_js_1 = __importDefault(require("./controller/sql/insert_rec
 const update_records_js_1 = __importDefault(require("./controller/sql/update_records.js"));
 const login_request_validation_js_1 = __importDefault(require("./controller/middleware/login_request_validation.js"));
 const register_request_validation_js_1 = __importDefault(require("./controller/middleware/register_request_validation.js"));
-const update_files_js_1 = __importDefault(require("./controller/file_handlers/updates/update_files.js"));
 const send_emails_js_1 = __importDefault(require("./controller/other/send_emails.js"));
 const select_request_js_1 = __importDefault(require("./DB/select_request.js"));
 const refund_request_validation_js_1 = __importDefault(require("./controller/middleware/refund_request_validation.js"));
 const write_json_js_1 = __importDefault(require("./controller/file_handlers/write_json.js"));
-const modify_images_js_1 = __importDefault(require("./controller/file_handlers/modify_images.js"));
 const validate_user_data_js_1 = __importDefault(require("./controller/middleware/validate_user_data.js"));
 const send_receipt_js_1 = __importDefault(require("./controller/emails/send_receipt.js"));
 const save_files_to_volume_js_1 = __importDefault(require("./controller/file_handlers/savers/save_files_to_volume.js"));
+const update_files_in_volume_js_1 = __importDefault(require("./controller/file_handlers/updates/update_files_in_volume.js"));
 const bcrypt = require('bcrypt');
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 var endpointSecret = undefined;
@@ -197,11 +196,8 @@ exports.router.post('/add_record', request_data_transformer_js_1.default, check_
     return __awaiter(this, void 0, void 0, function* () {
         const transformed_data = req.body.transformed_data;
         var record_id = yield (0, insert_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values);
-        var folder = JSON.parse(req.body.folder);
         if (req.files) {
-            yield (0, save_files_to_volume_js_1.default)(req.files, folder, record_id);
-            //await save_files("./public/images/temp/", req.files)
-            //modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
+            yield (0, save_files_to_volume_js_1.default)(req.files, JSON.parse(req.body.folder), record_id);
         }
         res.send({ msg: "Record successfully added", next_status: true, status: true });
     });
@@ -209,6 +205,9 @@ exports.router.post('/add_record', request_data_transformer_js_1.default, check_
 exports.router.post('/edit_record', request_data_transformer_js_1.default, check_for_duplicit_record_js_1.default, (0, try_catch_js_1.default)(function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const transformed_data = req.body.transformed_data;
+        var folder = JSON.parse(req.body.folder);
+        var record_id = JSON.parse(req.body.record_id);
+        var file_names_to_keep = JSON.parse(req.body.files_names_to_keep);
         if (req.body.files_names_to_keep) {
             yield (0, update_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values, JSON.parse(req.body.record_id), JSON.parse(req.body.files_names_to_keep));
         }
@@ -216,11 +215,10 @@ exports.router.post('/edit_record', request_data_transformer_js_1.default, check
             yield (0, update_records_js_1.default)(transformed_data.tables, transformed_data.columns, transformed_data.values, JSON.parse(req.body.record_id));
         }
         if (req.files) {
-            yield (0, update_files_js_1.default)(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id), req.files);
-            (0, modify_images_js_1.default)("./public/images/temp/", JSON.parse(req.body.record_id), JSON.parse(req.body.folder));
+            yield (0, update_files_in_volume_js_1.default)(folder, record_id, file_names_to_keep, req.files);
         }
         else if (req.body.files_names_to_keep) {
-            yield (0, update_files_js_1.default)(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id));
+            yield (0, update_files_in_volume_js_1.default)(folder, record_id, file_names_to_keep);
         }
         if (req.body.psw_change) {
             return res.send({ msg: "Password successfully changed", next_status: true });
@@ -426,4 +424,12 @@ exports.router.post('/check_for_admin', (0, try_catch_js_1.default)(function (re
         }
     });
 }));
+// router.post('/volime_images_test', try_catch(async function (req: Request, res: Response) {   
+//   var id = Number((await select_request("SELECT id FROM users WHERE email = ? AND password = ? ;", [JSON.parse(req.body.email), JSON.parse(req.body.password)]))[0].id)
+//   if(id === Number(process.env.ADMIN_ID)){
+//     res.send({msg: "user is admin", next_status: true})
+//   }else{
+//     res.send({msg: "user is not a admin", next_status: false})
+//   }
+// }))
 exports.router.use(error_handler_js_1.default);

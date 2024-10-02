@@ -284,12 +284,8 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var record_id = await insert_records(transformed_data.tables, transformed_data.columns, transformed_data.values)
 
-    var folder = JSON.parse(req.body.folder)
-
     if(req.files){
-      await save_files_to_volume(req.files, folder, record_id)
-      //await save_files("./public/images/temp/", req.files)
-      //modify_images("./public/images/temp/", record_id, JSON.parse(req.body.folder))
+      await save_files_to_volume(req.files, JSON.parse(req.body.folder), record_id)
     }
 
     res.send({msg: "Record successfully added", next_status: true, status: true})
@@ -312,11 +308,9 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
   
     if(req.files){
       await update_files_in_volume(folder, record_id, file_names_to_keep, req.files)
-      //await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id), req.files)
-      //modify_images("./public/images/temp/", JSON.parse(req.body.record_id), JSON.parse(req.body.folder))
+  
     }else if(req.body.files_names_to_keep){
       await update_files_in_volume(folder, record_id, file_names_to_keep)
-      //await update_files(JSON.parse(req.body.files_names_to_keep), JSON.parse(req.body.folder), JSON.parse(req.body.record_id))
     }
 
     if(req.body.psw_change){

@@ -14,7 +14,8 @@ app.use((0, cors_1.default)()); //enable the express server to respond to prefli
 app.use(body_parser_1.default.urlencoded({ extended: true })); //support parsing of application/x-www-form-urlencoded post data
 app.use(body_parser_1.default.json()); // support parsing of application/json type post data
 app.use((0, express_fileupload_1.default)()); //file support
-app.use(express_1.default.static('public')); //udeluje pristup k server public dir
+app.use(express_1.default.static('./public')); //udeluje pristup k server public dir
+app.use(express_1.default.static('/image_storage')); //udeluje pristup k server public dir
 app.use('/', routes_js_1.router); // pristupuje k app.post/get requestum
 const port = process.env.PORT || 4000;
 app.listen(port, function () {
