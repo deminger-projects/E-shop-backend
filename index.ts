@@ -18,9 +18,7 @@ app.use(express.static('./public')) //udeluje pristup k server public dir
 
 //app.use(express.static('./image_storage')) //udeluje pristup k server public dir
 
-app.use(express.static('/app/image_storage')) //udeluje pristup k server public dir
-
-//app.use(express.static('/image_storage')) //udeluje pristup k server public dir
+app.use(express.static('/image_storage')) //udeluje pristup k server public dir
 
 
 app.use('/', router)  // pristupuje k app.post/get requestum
