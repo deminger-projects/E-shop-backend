@@ -29,48 +29,70 @@ export default async function save_files_to_volume(files: FileArray, folder: str
         await single_file.mv(storage_name + folder + "/" + record_id + "/" + single_file.name)
     }
 
+    var files_in_folder = fs.readdirSync(storage_name + folder + "/" + record_id + "/")
 
 
     sharp.cache(false);
 
 
-
-    if(multiple_files){
-        for(let file of multiple_files){
-            sharp("/image_storage/" + folder + "/" + record_id + "/" + file)
-            .jpeg()
-            .jpeg({ quality: 80 })
-            .jpeg({ progressive: true })
-            .resize(150, 150)  
-            .toFile("/image_storage/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
-                if (err) {
-                console.error(err);
-                }else{
-                    console.log("save succesfull")
-
-                    fs.unlinkSync("/image_storage/" + folder + "/" + record_id + "/" + file)
-                }
-            }) 
-        }
-    }
-
-
-
-    if(single_file){
-        sharp("/image_storage/" + folder + "/" + record_id + "/" + single_file)
+    for(let file of files_in_folder){
+        sharp("/image_storage/" + folder + "/" + record_id + "/" + file)
         .jpeg()
         .jpeg({ quality: 80 })
         .jpeg({ progressive: true })
         .resize(150, 150)  
-        .toFile("/image_storage/" + folder + "/" + record_id + "/" + single_file, (err: Error, info: any) => {
+        .toFile("/image_storage/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
             if (err) {
             console.error(err);
             }else{
                 console.log("save succesfull")
 
-                fs.unlinkSync("/image_storage/" + folder + "/" + record_id + "/" + single_file)
+                fs.unlinkSync("/image_storage/" + folder + "/" + record_id + "/" + file)
             }
         }) 
     }
+
+
+
+
+
+
+    // if(multiple_files){
+    //     for(let file of multiple_files){
+    //         sharp("/image_storage/" + folder + "/" + record_id + "/" + file)
+    //         .jpeg()
+    //         .jpeg({ quality: 80 })
+    //         .jpeg({ progressive: true })
+    //         .resize(150, 150)  
+    //         .toFile("/image_storage/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
+    //             if (err) {
+    //             console.error(err);
+    //             }else{
+    //                 console.log("save succesfull")
+
+    //                 fs.unlinkSync("/image_storage/" + folder + "/" + record_id + "/" + file)
+    //             }
+    //         }) 
+    //     }
+    // }
+
+
+
+    // if(single_file){
+    //     sharp("/image_storage/" + folder + "/" + record_id + "/" + single_file)
+    //     .jpeg()
+    //     .jpeg({ quality: 80 })
+    //     .jpeg({ progressive: true })
+    //     .resize(150, 150)  
+    //     .toFile("/image_storage/" + folder + "/" + record_id + "/" + single_file, (err: Error, info: any) => {
+    //         if (err) {
+    //         console.error(err);
+    //         }else{
+    //             console.log("save succesfull")
+
+    //             fs.unlinkSync("/image_storage/" + folder + "/" + record_id + "/" + single_file)
+    //         }
+    //     }) 
+    // }
 
 }
