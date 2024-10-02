@@ -285,6 +285,8 @@ router.post('/webhook', express.raw({type: 'application/json'}), try_catch(async
 
     var folder = JSON.parse(req.body.folder)
 
+    console.log("test for railway")
+
     if(req.files){
       await save_files_to_volume(req.files, folder, record_id)
       //await save_files("./public/images/temp/", req.files)
