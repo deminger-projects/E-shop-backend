@@ -20,8 +20,8 @@ export default async function save_files_to_volume(files: FileArray, folder: str
 
     
 
-    if(!fs.existsSync(storage_name + folder + "/temp/" + record_id + "/")){
-        fs.mkdirSync(storage_name + folder + "/temp/" + record_id + "/")
+    if(!fs.existsSync(storage_name + folder + "/temp/")){
+        fs.mkdirSync(storage_name + folder + "/temp/")
     }   
 
 
@@ -29,15 +29,15 @@ export default async function save_files_to_volume(files: FileArray, folder: str
 
     if(multiple_files){
         for(var file of multiple_files){
-            await file.mv(storage_name + folder + "/temp/" + record_id + "/" + file.name)
+            await file.mv(storage_name + folder + "/temp/" + file.name)
         }
     }
 
     if(single_file){
-        await single_file.mv(storage_name + folder + "/temp/" + record_id + "/" + single_file.name)
+        await single_file.mv(storage_name + folder + "/temp/" + single_file.name)
     }
 
-    var files_in_folder = fs.readdirSync(storage_name + folder + "/temp/" + record_id + "/")
+    var files_in_folder = fs.readdirSync(storage_name + folder + "/temp/")
 
 
     sharp.cache(false);
@@ -55,7 +55,7 @@ export default async function save_files_to_volume(files: FileArray, folder: str
             }else{
                 console.log("save succesfull")
 
-                fs.unlinkSync("/image_storage/" + folder + "/temp/" + record_id + "/" + file)
+                fs.unlinkSync("/image_storage/" + folder + "/temp/" + file)
             }
         }) 
     }
