@@ -39,9 +39,9 @@ export default async function save_files_to_volume(files: FileArray, folder: str
         for(let file of multiple_files){
             sharp("/image_storage/" + folder + "/" + record_id + "/" + file)
             .jpeg()
-            .jpeg({ quality: 100 })
+            .jpeg({ quality: 80 })
             .jpeg({ progressive: true })
-            .resize(200, 200)  
+            .resize(150, 150)  
             .toFile("/image_storage/" + folder + "/" + record_id + "/" + file, (err: Error, info: any) => {
                 if (err) {
                 console.error(err);
@@ -53,13 +53,13 @@ export default async function save_files_to_volume(files: FileArray, folder: str
     }
 
 
-    
+
     if(single_file){
         sharp("/image_storage/" + folder + "/" + record_id + "/" + single_file)
         .jpeg()
-        .jpeg({ quality: 100 })
+        .jpeg({ quality: 80 })
         .jpeg({ progressive: true })
-        .resize(200, 200)  
+        .resize(150, 150)  
         .toFile("/image_storage/" + folder + "/" + record_id + "/" + single_file, (err: Error, info: any) => {
             if (err) {
             console.error(err);
